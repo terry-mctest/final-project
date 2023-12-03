@@ -47,7 +47,8 @@ fluidPage(
                 choices = c("fixed_acidity", "volatile_acidity", "citric_acid",
                           "residual_sugar", "chlorides", "free_sulfur_dioxide",
                           "total_sulfur_dioxide", "density", "pH", "sulphates",
-                          "alcohol", "quality", "type")),
+                          "alcohol", "quality", "type"),
+                selected = "fixed_acidity"),
               br(),
               conditionalPanel(condition = "input.bd_dropdown != 'type'",
                 radioButtons("bd_radio", "Disaggregate/filter by wine type?",
@@ -55,7 +56,9 @@ fluidPage(
                               "Show white only", "No disaggregation/filtering"))
               )
             ),
-            mainPanel()
+            mainPanel(
+              plotOutput("bd_plot")
+            )
           )
         ), 
 
