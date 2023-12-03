@@ -27,23 +27,22 @@ shinyServer(function(input, output, session) {
      
     #data for white only
     white_only <- subset(red_and_white, type == "White")
-
+    
+    
+      var <- !!sym(input$bd_dropdown)
     
     	if(input$bd_radio=="Disaggregate (red vs. white)"){
-    	  ggplot(data=red_and_white, aes(x=!!sym(input$bd_dropdown), fill=type)) + 
-    	  geom_histogram(adjust = 0.5, alpha = 0.5)
+    	  ggplot(data=red_and_white, aes(x=var, fill=type)) + 
+    	  geom_density(adjust = 0.5, alpha = 0.5)
     	} 
       else if(input$bd_radio=="Show red only"){
-    	  ggplot(data=red_only, x=!!sym(input$bd_dropdown)) + 
-    	  geom_histogram()
+    	  ggplot(data=red_only, x=var) + geom_density()
     	}
       else if(input$bd_radio=="Show white only"){
-    	  ggplot(data=white_only, x=!!sym(input$bd_dropdown)) + 
-    	  geom_histogram()
+    	  ggplot(data=white_only, x=var) + geom_density()
     	}
       else if(input$bd_radio=="No disaggregation/filtering"){
-    	  ggplot(data=red_and_white, x=!!sym(input$bd_dropdown)) + 
-    	  geom_histogram()
+    	  ggplot(data=red_and_white, x=var) + geom_density()
       }
 
   })
