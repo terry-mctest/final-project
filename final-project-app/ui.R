@@ -43,11 +43,17 @@ fluidPage(
           #titlePanel("lkjafds"),
           sidebarLayout(
             sidebarPanel(
-              selectInput("bd_dropdown", "Measure of interest:",
-                choices = c("fixed acidity", "volatile acidity", "citric acid",
-                          "residual sugar", "chlorides", "free sulfur dioxide",
-                          "total sulfur dioxide", "density", "pH", "sulphates",
-                          "alcohol", "quality"))
+              selectInput("bd_dropdown", "Select measure of interest:",
+                choices = c("fixed_acidity", "volatile_acidity", "citric_acid",
+                          "residual_sugar", "chlorides", "free_sulfur_dioxide",
+                          "total_sulfur_dioxide", "density", "pH", "sulphates",
+                          "alcohol", "quality", "type")),
+              br(),
+              conditionalPanel(condition = "input.bd_dropdown != 'type'",
+                radioButtons("bd_radio", "Disaggregate/filter by wine type?",
+                  choices = c("Disaggregate (red vs. white)", "Show red only",
+                              "Show white only", "No disaggregation/filtering"))
+              )
             ),
             mainPanel()
           )

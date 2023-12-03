@@ -8,6 +8,23 @@
 #
 
 library(shiny)
+library(readr)
+
+
+#base datafiles
+
+#red+white wines
+red_and_white <- data.frame(read_csv("winequality-full.csv"))
+
+#red only
+red_only <- subset(red_and_white, type == "Red")
+ 
+#white only
+white_only <- subset(red_and_white, type == "White")
+
+
+  
+  
 
 # Define server logic required to draw a histogram
 function(input, output, session) {
