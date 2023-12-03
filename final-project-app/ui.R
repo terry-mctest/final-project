@@ -44,17 +44,28 @@ fluidPage(
           sidebarLayout(
             sidebarPanel(
               selectInput("bd_dropdown", "Select measure of interest:",
-                choices = c("fixed_acidity", "volatile_acidity", "citric_acid",
-                          "residual_sugar", "chlorides", "free_sulfur_dioxide",
-                          "total_sulfur_dioxide", "density", "pH", "sulphates",
-                          "alcohol", "quality", "type"),
-                selected = "fixed_acidity"),
+                choices = c("fixed_acidity" = 1, 
+                            "volatile_acidity" = 2, 
+                            "citric_acid" = 3,
+                            "residual_sugar" = 4, 
+                            "chlorides" = 5, 
+                            "free_sulfur_dioxide" = 6,
+                            "total_sulfur_dioxide" = 7, 
+                            "density" = 8, 
+                            "pH" = 9, 
+                            "sulphates" = 10,
+                            "alcohol" = 11, 
+                            "quality" = 12, 
+                            "type" = 13),
+                selected = 1),
               br(),
               #conditionalPanel(condition = "input.bd_dropdown != 'type'",
                 radioButtons("bd_radio", "Disaggregate/filter by wine type?",
-                  choices = c("Disaggregate (red vs. white)", "Show red only",
-                              "Show white only", "No disaggregation/filtering"),
-                selected = "Disaggregate (red vs. white)"#)
+                  choices = c("Disaggregate (red vs. white)" = 1, 
+                              "Show red only" = 2,
+                              "Show white only" = 3, 
+                              "No disaggregation/filtering" = 4),
+                selected = 1#)
               )
             ),
             mainPanel(
