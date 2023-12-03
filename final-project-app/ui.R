@@ -6,28 +6,23 @@
 #
 #    http://shiny.rstudio.com/
 #
+#SEE ALSO 6.3.1 FROM:  https://mastering-shiny.org/action-layout.html
 
 library(shiny)
 
-# Define UI for application that draws a histogram
 fluidPage(
-
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-            plotOutput("distPlot")
-        )
-    )
+  tabsetPanel(
+    tabPanel("Import data", 
+      fileInput("file", "Data", buttonLabel = "Upload..."),
+      textInput("delim", "Delimiter (leave blank to guess)", ""),
+      numericInput("skip", "Rows to skip", 0, min = 0),
+      numericInput("rows", "Rows to preview", 10, min = 1)
+    ),
+    tabPanel("Set parameters",
+             tabsetPanel(
+               tabPanel("subpanel1"),
+                tabPanel("subpanel2")
+             )),
+    tabPanel("Visualise results")
+  )
 )
