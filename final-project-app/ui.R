@@ -13,7 +13,7 @@ library(shiny)
 
 fluidPage(
   
-  theme = bslib::bs_theme(bootswatch = "slate"),
+  theme = bslib::bs_theme(bootswatch = "morph"),
   #https://bootswatch.com/
 
       
@@ -50,10 +50,11 @@ fluidPage(
                           "alcohol", "quality", "type"),
                 selected = "fixed_acidity"),
               br(),
-              conditionalPanel(condition = "input.bd_dropdown != 'type'",
+              #conditionalPanel(condition = "input.bd_dropdown != 'type'",
                 radioButtons("bd_radio", "Disaggregate/filter by wine type?",
                   choices = c("Disaggregate (red vs. white)", "Show red only",
-                              "Show white only", "No disaggregation/filtering"))
+                              "Show white only", "No disaggregation/filtering"),
+                selected = "Disaggregate (red vs. white)"#)
               )
             ),
             mainPanel(
