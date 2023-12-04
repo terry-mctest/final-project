@@ -11,7 +11,13 @@ library(shiny)
 library(readr)
 library(ggplot2)
 
+  
 
+shinyServer(function(input, output, session) {
+
+ 
+  output$bd_plot <- renderPlot({
+    
     #data for red+white wines
     red_and_white <- data.frame(read_csv("winequality-full.csv"))
     red_and_white$quality <- as.factor(red_and_white$quality)	
@@ -23,18 +29,11 @@ library(ggplot2)
     #data for white only
     white_only <- subset(red_and_white, type == "White")
 
-
-  
-
-shinyServer(function(input, output, session) {
-
- 
-  output$bd_plot <- renderPlot({
     
       var_num <- input$bd_dropdown
     
     	if(input$bd_radio==1){
-    	  ggplot(data=red_and_white, aes(x=(red_and_white[ ,var_num]), 
+    	  ggplot(data=red_and_white, aes(x=(red_and_white[ ,var_num]),
     	                                 fill=type)) + 
     	  geom_density(adjust = 0.5, alpha = 0.5)
     	} 
@@ -42,27 +41,14 @@ shinyServer(function(input, output, session) {
     	  ggplot(data=red_only, x=(red_only[ ,var_num])) + geom_density()
     	}
       else if(input$bd_radio==3){
-    	  ggplot(data=white_only, x=(white_only[ ,var_num])) + geom_density()
+    	  ggplot(data=white_only, x=(white_only[ ,var_num])) +
+        geom_density()
     	}
       else if(input$bd_radio==4){
-    	  ggplot(data=red_and_white, x=(red_and_white[ ,var_num])) + geom_density()
+    	  ggplot(data=red_and_white, x=(red_and_white[ ,var_num])) +
+        geom_density()
       }
 
   })
   
-  
-
-    output$distPlot <- renderPlot({
-
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-
-    })
-
 })

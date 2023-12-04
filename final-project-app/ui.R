@@ -40,7 +40,6 @@ fluidPage(
       tabsetPanel(
                
         tabPanel("Basic descriptives",
-          #titlePanel("lkjafds"),
           sidebarLayout(
             sidebarPanel(
               selectInput("bd_dropdown", "Select measure of interest:",
@@ -59,23 +58,22 @@ fluidPage(
                             "type" = 13),
                 selected = 1),
               br(),
-              #conditionalPanel(condition = "input.bd_dropdown != 'type'",
+              conditionalPanel(condition = "input.bd_dropdown != '13'",
                 radioButtons("bd_radio", "Disaggregate/filter by wine type?",
                   choices = c("Disaggregate (red vs. white)" = 1, 
                               "Show red only" = 2,
                               "Show white only" = 3, 
                               "No disaggregation/filtering" = 4),
-                selected = 1#)
-              )
-            ),
+                selected = 1))
+              ),
             mainPanel(
               plotOutput("bd_plot")
             )
-          )
-        ), 
+          ), 
 
         tabPanel("Associations with wine quality")
         )
+      )
     ),
 
         
