@@ -51,7 +51,7 @@ fluidPage(
                             "free_sulfur_dioxide",# = 6,
                             "total_sulfur_dioxide",# = 7, 
                             "density",# = 8, 
-                            "pH",# = 9, 
+                            "p_h",# = 9, 
                             "sulphates",# = 10,
                             "alcohol",# = 11, 
                             "quality",# = 12, 
@@ -60,14 +60,15 @@ fluidPage(
               br(),
               conditionalPanel(condition = "input.bd_dropdown != 'type'",
                 radioButtons("bd_radio", "Disaggregate/filter by wine type?",
-                  choices = c("Disaggregate (red vs. white)" = 1, 
-                              "Show red only" = 2,
-                              "Show white only" = 3, 
+                  choices = c("Disaggregate (reds vs. whites)" = 1, 
+                              "Show reds only" = 2,
+                              "Show whites only" = 3, 
                               "No disaggregation/filtering" = 4),
                 selected = 1))
               ),
             mainPanel(
-              plotOutput("bd_plot")
+              plotOutput("bd_plot"),
+              tableOutput("bd_table")
             )
           ), 
         ),
