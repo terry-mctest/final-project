@@ -70,12 +70,44 @@ fluidPage(
               plotOutput("bd_plot"),
               tableOutput("bd_table")
             )
-          ), 
+          ) 
         ),
         
-        tabPanel("Associations with wine quality")
+        tabPanel("Associations with wine quality",
+          sidebarLayout(
+            sidebarPanel(
+              selectInput("q_dropdown", "Select measure of interest:",
+                choices = c("fixed_acidity",# = 1, 
+                            "volatile_acidity",# = 2, 
+                            "citric_acid",# = 3,
+                            "residual_sugar",# = 4, 
+                            "chlorides",# = 5, 
+                            "free_sulfur_dioxide",# = 6,
+                            "total_sulfur_dioxide",# = 7, 
+                            "density",# = 8, 
+                            "p_h",# = 9, 
+                            "sulphates",# = 10,
+                            "alcohol"),# = 11), 
+                selected = 1),
+              br(),
+              radioButtons("plot_type_radio", "Desired plot type:",
+                choices = c("Scatterplot" = 1,
+                            "Boxplot" = 2),
+                selected = 1),
+              br(),
+              conditionalPanel(condition = "input.plot_type_radio ==
+                               '1'",
+                radioButtons("wine_type_radio", "Disaggregate by wine type?",
+                  choices = c("Yes" = 1, 
+                              "No" = 2),
+                selected = 1))
+              ),
+            mainPanel(
+            )                 
+          )
         )
-      ),
+      )
+    ),
 
         
     # *MODELING* TAB
