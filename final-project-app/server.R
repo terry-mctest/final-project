@@ -35,10 +35,11 @@ library(stringr)
 shinyServer(function(input, output, session) {
 
 observe({
-  
-############################  
-# *BASIC DESCRIPTIVES* TAB #
-############################
+
+    
+#################################  
+# *BASIC DESCRIPTIVES* (sub)TAB #
+#################################
 
 #results for *type* var (all other vars are continuous)
 if(input$bd_dropdown=="type"){
@@ -138,16 +139,16 @@ else if(input$bd_radio==4){
   
   
   
-########################################  
-# *ASSOCIATIONS WITH WINE QUALITY* TAB #
-########################################
+#############################################  
+# *ASSOCIATIONS WITH WINE QUALITY* (sub)TAB #
+#############################################
 
 #scatter/jitterplot w/disaggegation by type
 if(input$plot_type_radio==1 && input$wine_type_radio==1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), y=quality, 
                                      color=type, position="jitter")) + 
-    	geom_jitter() + geom_smooth(method="lm") + 
+    	geom_jitter() + geom_smooth(method = "lm") + 
       labs(y = "Wine Quality Rating",
            title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
                           (str_to_upper(aes_string(input$q_dropdown))))) +
@@ -159,7 +160,7 @@ if(input$plot_type_radio==1 && input$wine_type_radio==1){
 else if(input$plot_type_radio==1 && input$wine_type_radio != 1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), y=quality)) + 
-    	geom_jitter() + geom_smooth(method="lm") + 
+    	geom_jitter() + geom_smooth(method = "lm") + 
       labs(y = "Wine Quality Rating",
            title = 
              paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
@@ -168,7 +169,7 @@ else if(input$plot_type_radio==1 && input$wine_type_radio != 1){
     	})
 }
   
-#boxplot w/disaggregation
+#boxplot w/disaggregation by type
 else if(input$plot_type_radio==2 && input$wine_type_radio==1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), 
@@ -182,7 +183,7 @@ else if(input$plot_type_radio==2 && input$wine_type_radio==1){
     	})
 }
 
-#boxplot w/o disaggregation
+#boxplot w/o disaggregation by type
 else if(input$plot_type_radio==2 && input$wine_type_radio != 1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), 
@@ -197,6 +198,7 @@ else if(input$plot_type_radio==2 && input$wine_type_radio != 1){
   
 }
 
+#generate correlation coefficients to accompany the jitter/box plots above
 if(input$wine_type_radio == 1){ 
   temp <- red_and_white %>% 
   select(type, quality, !!sym(input$q_dropdown)) %>%
@@ -207,7 +209,6 @@ if(input$wine_type_radio == 1){
       as_tibble(temp)
       })
 } 
-  
 else if(input$wine_type_radio != 1){
   #temp <- red_and_white %>% select(quality, !!sym(input$q_dropdown))
   temp <- red_and_white %>% 
@@ -221,6 +222,16 @@ else if(input$wine_type_radio != 1){
 }  
 
 
+  
+############################
+# *MODEL FITTING* (sub)TAB #
+############################  
+ 
+   
+#########################
+# *PREDICTION* (sub)TAB #
+#########################  
+  
    
 })
 

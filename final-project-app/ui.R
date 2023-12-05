@@ -70,7 +70,9 @@ fluidPage(
     ),
     
     
-    # *DATA EXPLORATION* TAB
+    ##########################
+    # *DATA EXPLORATION* TAB #
+    ##########################
     tabPanel("DATA EXPLORATION",
       tabsetPanel(
 
@@ -80,7 +82,7 @@ fluidPage(
         tabPanel("Basic descriptives",
           sidebarLayout(
             sidebarPanel(
-              selectInput("bd_dropdown", "Select measure of interest:",
+              selectInput("bd_dropdown", "First, select measure of interest:",
                 choices = c("fixed_acidity",# = 1, 
                             "volatile_acidity",# = 2, 
                             "citric_acid",# = 3,
@@ -97,7 +99,7 @@ fluidPage(
                 selected = 1),
               br(),
               conditionalPanel(condition = "input.bd_dropdown != 'type'",
-                radioButtons("bd_radio", "Disaggregate/filter by wine type?",
+                radioButtons("bd_radio", "Then select preferred disaggregation/filtering approach:",
                   choices = c("Disaggregate (reds vs. whites)" = 1, 
                               "Show reds only" = 2,
                               "Show whites only" = 3, 
@@ -117,7 +119,7 @@ fluidPage(
         tabPanel("Associations with wine quality",
           sidebarLayout(
             sidebarPanel(
-              selectInput("q_dropdown", "Select measure of interest:",
+              selectInput("q_dropdown", "First, select measure of interest:",
                 choices = c("fixed_acidity",# = 1, 
                             "volatile_acidity",# = 2, 
                             "citric_acid",# = 3,
@@ -131,7 +133,7 @@ fluidPage(
                             "alcohol"),# = 11), 
                 selected = 1),
               br(),
-              radioButtons("plot_type_radio", "Desired plot type:",
+              radioButtons("plot_type_radio", "Then select desired plot type:",
                 choices = c("Scatterplot/Jitterplot" = 1,
                             "Boxplot" = 2),
                 selected = 1),
@@ -155,19 +157,69 @@ fluidPage(
     ),
 
         
-    # *MODELING* TAB
+    ##################
+    # *MODELING* TAB #
+    ##################
     tabPanel("MODELING",
       tabsetPanel(
-               
+
+        ############################
+        # *MODELING INFO* (sub)TAB #
+        ############################
+        
         tabPanel("Modeling Info", 
           fileInput("file", "Data", buttonLabel = "Upload..."),
           textInput("delim", "Delimiter (leave blank to guess)", ""),
           numericInput("skip", "Rows to skip", 0, min = 0),
-          numericInput("rows", "Rows to preview", 10, min = 1)),
-                
-        tabPanel("Model Fitting"),
-                
-        tabPanel("Prediction")
+          numericInput("rows", "Rows to preview", 10, min = 1)
+        ),
+
+                        
+        ###############################
+        # *MODELING FITTING* (sub)TAB #
+        ###############################
+        
+        tabPanel("Model Fitting",
+          sidebarLayout(
+            sidebarPanel(
+              sliderInput("slider", label="First, define the proportion of records to be randomly selected for use in model training (records not used for model training will be used for model testing):", 
+                          min=50, max=90, value=80, step=1, post="%"),
+              br(),
+              radioButtons("model_radio", 
+                           "Next, select the type of model to be fit:",
+                choices = c("Multiple linear regression" = 1, 
+                            "Random forest" = 2), 
+                selected = 1),
+              br(),
+              checkboxGroupInput("predictors", 
+                    "Then select the variables to be used in modeling wine quality:",
+                choices = c("fixed_acidity",# = 1, 
+                            "volatile_acidity",# = 2, 
+                            "citric_acid",# = 3,
+                            "residual_sugar",# = 4, 
+                            "chlorides",# = 5, 
+                            "free_sulfur_dioxide",# = 6,
+                            "total_sulfur_dioxide",# = 7, 
+                            "density",# = 8, 
+                            "p_h",# = 9, 
+                            "sulphates",# = 10,
+                            "alcohol",# = 11, 
+                            "type")# = 13),
+              ),
+              actionButton("run_model", "Click here to run model")
+            ),
+            mainPanel(
+            )
+          )
+        ),
+
+                        
+        #########################
+        # *PREDICTION* (sub)TAB #
+        #########################
+        
+        tabPanel("Prediction"
+        )
       )
     )
   )
