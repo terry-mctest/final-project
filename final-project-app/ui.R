@@ -19,7 +19,9 @@ fluidPage(
       
   tabsetPanel(
   
-    # *ABOUT* TAB
+    ###############
+    # *ABOUT* TAB #
+    ###############
     tabPanel("ABOUT",
       titlePanel("BLAH BLAH BLAH"),
       h1("this is h1"),
@@ -38,7 +40,10 @@ fluidPage(
     # *DATA EXPLORATION* TAB
     tabPanel("DATA EXPLORATION",
       tabsetPanel(
-               
+
+        #################################
+        # *BASIC DESCRIPTIVES* (sub)TAB #
+        #################################
         tabPanel("Basic descriptives",
           sidebarLayout(
             sidebarPanel(
@@ -73,6 +78,9 @@ fluidPage(
           ) 
         ),
         
+        ##########################################
+        # *ASSOCIATIONS W/WINE QUALITY* (sub)TAB #
+        ##########################################
         tabPanel("Associations with wine quality",
           sidebarLayout(
             sidebarPanel(
@@ -91,18 +99,22 @@ fluidPage(
                 selected = 1),
               br(),
               radioButtons("plot_type_radio", "Desired plot type:",
-                choices = c("Scatterplot" = 1,
+                choices = c("Scatterplot/Jitterplot" = 1,
                             "Boxplot" = 2),
                 selected = 1),
               br(),
-              conditionalPanel(condition = "input.plot_type_radio ==
-                               '1'",
-                radioButtons("wine_type_radio", "Disaggregate by wine type?",
+              radioButtons("wine_type_radio", "Disaggregate by wine type?",
                   choices = c("Yes" = 1, 
                               "No" = 2),
-                selected = 1))
-              ),
+                selected = 1)
+            ),
             mainPanel(
+              plotOutput("q_plot"),
+              strong("NOTE: Wine quality was rated on a scale of 0 to 10, where 0 indicates the lowest quality, and 10 indicates the highest quality."),
+              br(),
+              br(),
+              h5("Correlation Coefficient(s):"),
+              tableOutput("q_table")
             )                 
           )
         )

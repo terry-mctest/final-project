@@ -13,6 +13,7 @@ library(ggplot2)
 library(janitor)
 library(tidyr)
 library(dplyr)
+library(stringr)
 
 
 
@@ -27,19 +28,25 @@ library(dplyr)
     #data for white only
     white_only <- subset(red_and_white, type == "White")
 
+    
 
-  
+
 
 shinyServer(function(input, output, session) {
 
 observe({
+  
+############################  
+# *BASIC DESCRIPTIVES* TAB #
+############################
 
 #results for *type* var (all other vars are continuous)
 if(input$bd_dropdown=="type"){
   #output plot
   output$bd_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=type)) + geom_bar() + 
-      labs(title = "Number of Wines, by Wine Type")
+      labs(title = "Number of Wines, by Wine Type") +
+      theme(plot.title = element_text(face="bold", size=16))
     	})
   
   #output table
@@ -57,8 +64,10 @@ else if(input$bd_radio==1){
       var_num <- input$bd_dropdown
       ggplot(data=red_and_white, aes(x=!!sym(input$bd_dropdown), fill=type)) + 
     	geom_density(adjust = 0.5, alpha = 0.5) + 
-      labs(title = "Distribution Among Reds vs. Distribution Among Whites") +
-      scale_fill_discrete(name = "Wine Type") 
+      labs(title = 
+          "DISTRIBUTION AMONG RED WINES vs. DISTRIBUTION AMONG WHITE WINES") +
+      scale_fill_discrete(name = "Wine Type") +
+      theme(plot.title = element_text(face="bold", size=16)) 
     	})
   
   #output table
@@ -79,7 +88,8 @@ else if(input$bd_radio==2){
       var_num <- input$bd_dropdown
       ggplot(data=red_only, aes(x=!!sym(input$bd_dropdown))) + 
     	geom_density(adjust = 0.5, alpha = 0.5) + 
-      labs(title = "Distribution Among Red Wines Only")
+      labs(title = "DISTRIBUTION AMONG RED WINES ONLY") +
+      theme(plot.title = element_text(face="bold", size=16))
     	})
   
   #output table
@@ -96,7 +106,8 @@ else if(input$bd_radio==3){
       var_num <- input$bd_dropdown
       ggplot(data=white_only, aes(x=!!sym(input$bd_dropdown))) + 
     	geom_density(adjust = 0.5, alpha = 0.5) + 
-      labs(title = "Distribution Among White Wines Only")
+      labs(title = "DISTRIBUTION AMONG WHITE WINES ONLY") +
+      theme(plot.title = element_text(face="bold", size=16))
     	})
     
   #output table
@@ -113,7 +124,8 @@ else if(input$bd_radio==4){
       var_num <- input$bd_dropdown
       ggplot(data=red_and_white, aes(x=!!sym(input$bd_dropdown))) + 
     	geom_density(adjust = 0.5, alpha = 0.5) + 
-      labs(title = "Distribution Among All Red & White Wines")
+      labs(title = "DISTRIBUTION AMONG ALL WINES (both red and white)") +
+      theme(plot.title = element_text(face="bold", size=16))
     	})
     
   #output table
@@ -122,7 +134,94 @@ else if(input$bd_radio==4){
       tibble::tibble(!!!summary(red_and_white[,input$bd_dropdown]))
   })
 }
+
   
+  
+  
+########################################  
+# *ASSOCIATIONS WITH WINE QUALITY* TAB #
+########################################
+
+#scatter/jitterplot w/disaggegation by type
+if(input$plot_type_radio==1 && input$wine_type_radio==1){
+  output$q_plot <- renderPlot({
+      ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), y=quality, 
+                                     color=type, position="jitter")) + 
+    	geom_jitter() + geom_smooth(method="lm") + 
+      labs(y = "Wine Quality Rating",
+           title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+      theme(plot.title = element_text(face="bold", size=16))
+    	})
+}
+
+#scatter/jitterplot w/o disaggegation by type
+else if(input$plot_type_radio==1 && input$wine_type_radio != 1){
+  output$q_plot <- renderPlot({
+      ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), y=quality)) + 
+    	geom_jitter() + geom_smooth(method="lm") + 
+      labs(y = "Wine Quality Rating",
+           title = 
+             paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+      theme(plot.title = element_text(face="bold", size=16))
+    	})
+}
+  
+#boxplot w/disaggregation
+else if(input$plot_type_radio==2 && input$wine_type_radio==1){
+  output$q_plot <- renderPlot({
+      ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), 
+                                     y = as.factor(quality))) + 
+    	geom_boxplot() + 
+      facet_wrap(~type) +
+      labs(y = "Wine Quality Rating",
+           title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+      theme(plot.title = element_text(face="bold", size=16))
+    	})
+}
+
+#boxplot w/o disaggregation
+else if(input$plot_type_radio==2 && input$wine_type_radio != 1){
+  output$q_plot <- renderPlot({
+      ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), 
+                                     y = as.factor(quality))) + 
+    	geom_boxplot() + 
+      labs(y = "Wine Quality Rating", 
+           title = 
+             paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+      theme(plot.title = element_text(face="bold", size=16))
+    	})
+  
+}
+
+if(input$wine_type_radio == 1){ 
+  temp <- red_and_white %>% 
+  select(type, quality, !!sym(input$q_dropdown)) %>%
+  group_by(type) %>%
+  summarize(r = cor(quality, (!!sym(input$q_dropdown))))
+
+  output$q_table <- renderTable({
+      as_tibble(temp)
+      })
+} 
+  
+else if(input$wine_type_radio != 1){
+  #temp <- red_and_white %>% select(quality, !!sym(input$q_dropdown))
+  temp <- red_and_white %>% 
+  select(quality, !!sym(input$q_dropdown)) %>%
+  summarize(r = cor(quality, (!!sym(input$q_dropdown))))
+  
+  output$q_table <- renderTable({
+      #as_tibble(cor(temp))
+      as_tibble(temp)
+      })
+}  
+
+
+   
 })
 
 })
