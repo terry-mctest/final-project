@@ -15,6 +15,7 @@ library(tidyr)
 library(dplyr)
 library(stringr)
 library(caret)
+library(randomForest)
 
 
 
@@ -230,8 +231,8 @@ else if(input$wine_type_radio != 1){
 observeEvent(input$run_model, {
 
   
-#multiple linear regression
-if(input$model_radio==1 && is.null(input$predictors)==0){
+#data prep
+if(is.null(input$predictors)==0){
 
   #subset data to selected variables
   model_dat <- red_and_white %>% select(quality, input$predictors)
@@ -242,19 +243,52 @@ if(input$model_radio==1 && is.null(input$predictors)==0){
                                     list=FALSE)
   train_dat <- model_dat[indextrain,]
   test_dat <- model_dat[-indextrain,]
+  }
   
-  #run model
-  model_results <- train(quality ~ ., data = train_dat,
+  
+#multiple linear regression
+if(input$model_radio==1 && is.null(input$predictors)==0){
+
+  test_results <- train(quality ~ ., data = train_dat,
       method="lm", 
-      preProcess=c("center","scale")
+      preProcess=c("center","scale"),
+      trControl=trainControl(method = "cv", number = 5)
       )
 
-  #output for UI
-  output$m_table <- renderPrint({
-      summary(model_results)
+  output$test1 <- renderPrint({
+      summary(test_results)
       })
+
+  output$test2 <- renderPrint({
+      test_results
+      })
+    
+  output$test_plot <- NULL
   }  
 
+
+#random forest
+else if(input$model_radio==2 && is.null(input$predictors)==0){
+
+  test_results <- train(quality ~ ., data = train_dat,
+      method="rf", 
+      preProcess=c("center","scale"),
+      trControl=trainControl(method = "cv", number = 5),
+      tuneGrid=data.frame(mtry=c(ncol(train_dat)/3))
+      )
+  
+  output$test1 <- renderPrint({
+      test_results
+      })
+  
+  output$test2 <- NULL
+  
+  output$test_plot <- renderPlot({
+      plot(varImp(test_results))
+    	})  
+  }  
+  
+  
 })
   
   
