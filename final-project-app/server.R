@@ -14,6 +14,7 @@ library(janitor)
 library(tidyr)
 library(dplyr)
 library(stringr)
+library(caret)
 
 
 
@@ -210,7 +211,6 @@ if(input$wine_type_radio == 1){
       })
 } 
 else if(input$wine_type_radio != 1){
-  #temp <- red_and_white %>% select(quality, !!sym(input$q_dropdown))
   temp <- red_and_white %>% 
   select(quality, !!sym(input$q_dropdown)) %>%
   summarize(r = cor(quality, (!!sym(input$q_dropdown))))
@@ -227,7 +227,38 @@ else if(input$wine_type_radio != 1){
 # *MODEL FITTING* (sub)TAB #
 ############################  
  
-   
+observeEvent(input$run_model, {
+
+  
+#multiple linear regression
+if(input$model_radio==1 && is.null(input$predictors)==0){
+
+  #subset data to selected variables
+  model_dat <- red_and_white %>% select(quality, input$predictors)
+  
+  # split into train vs test data
+  set.seed(433)
+  indextrain <- createDataPartition(1:nrow(model_dat), p=(input$slider/100), 
+                                    list=FALSE)
+  train_dat <- model_dat[indextrain,]
+  test_dat <- model_dat[-indextrain,]
+  
+  #run model
+  model_results <- train(quality ~ ., data = train_dat,
+      method="lm", 
+      preProcess=c("center","scale")
+      )
+
+  #output for UI
+  output$m_table <- renderPrint({
+      summary(model_results)
+      })
+  }  
+
+})
+  
+  
+  
 #########################
 # *PREDICTION* (sub)TAB #
 #########################  

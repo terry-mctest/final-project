@@ -209,7 +209,8 @@ fluidPage(
               actionButton("run_model", "Click here to run model")
             ),
             mainPanel(
-            )
+              verbatimTextOutput("m_table")  
+              )
           )
         ),
 
