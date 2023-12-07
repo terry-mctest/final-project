@@ -209,9 +209,9 @@ fluidPage(
               actionButton("run_model", "Click here to run model")
             ),
             mainPanel(
-              verbatimTextOutput("test1"),
-              verbatimTextOutput("test2"),
-              plotOutput("test_plot")
+              verbatimTextOutput("train1"),
+              verbatimTextOutput("train2"),
+              plotOutput("train_plot")
               )
           )
         ),

@@ -16,6 +16,7 @@ library(dplyr)
 library(stringr)
 library(caret)
 library(randomForest)
+#library(car)
 
 
 
@@ -249,42 +250,45 @@ if(is.null(input$predictors)==0){
 #multiple linear regression
 if(input$model_radio==1 && is.null(input$predictors)==0){
 
-  test_results <- train(quality ~ ., data = train_dat,
+  train_results <- train(quality ~ ., data = train_dat,
       method="lm", 
       preProcess=c("center","scale"),
       trControl=trainControl(method = "cv", number = 5)
       )
 
-  output$test1 <- renderPrint({
-      summary(test_results)
+  output$train1 <- renderPrint({
+      summary(train_results)
       })
 
-  output$test2 <- renderPrint({
-      test_results
+  output$train2 <- renderPrint({
+      train_results
       })
     
-  output$test_plot <- NULL
-  }  
+  #output$train_plot <- renderPlot({
+  #    avPlots(train_results)
+  #    })
+   output$train_plot <- NULL
+}  
 
 
 #random forest
 else if(input$model_radio==2 && is.null(input$predictors)==0){
 
-  test_results <- train(quality ~ ., data = train_dat,
+  train_results <- train(quality ~ ., data = train_dat,
       method="rf", 
       preProcess=c("center","scale"),
       trControl=trainControl(method = "cv", number = 5),
       tuneGrid=data.frame(mtry=c(ncol(train_dat)/3))
       )
   
-  output$test1 <- renderPrint({
-      test_results
+  output$train1 <- renderPrint({
+      train_results
       })
   
-  output$test2 <- NULL
+  output$train2 <- NULL
   
-  output$test_plot <- renderPlot({
-      plot(varImp(test_results))
+  output$train_plot <- renderPlot({
+      plot(varImp(train_results))
     	})  
   }  
   
