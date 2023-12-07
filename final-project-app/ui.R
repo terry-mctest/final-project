@@ -209,8 +209,11 @@ fluidPage(
               actionButton("run_model", "Click here to run model")
             ),
             mainPanel(
+              strong(h3(textOutput("train1_title"))),
               verbatimTextOutput("train1"),
+              strong(h3(textOutput("train2_title"))),
               verbatimTextOutput("train2"),
+              strong(h3(textOutput("train_plot_title"))),
               plotOutput("train_plot")
               )
           )

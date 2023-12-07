@@ -16,7 +16,7 @@ library(dplyr)
 library(stringr)
 library(caret)
 library(randomForest)
-#library(car)
+# library(car)
 
 
 
@@ -256,18 +256,18 @@ if(input$model_radio==1 && is.null(input$predictors)==0){
       trControl=trainControl(method = "cv", number = 5)
       )
 
+  output$train1_title <- renderText("Results from Training Data:")
   output$train1 <- renderPrint({
       summary(train_results)
       })
 
+  output$train2_title <- renderText("Cross-Validation:")
   output$train2 <- renderPrint({
       train_results
       })
     
-  #output$train_plot <- renderPlot({
-  #    avPlots(train_results)
-  #    })
-   output$train_plot <- NULL
+  output$train_plot_title <- NULL
+  output$train_plot <- NULL
 }  
 
 
@@ -281,12 +281,15 @@ else if(input$model_radio==2 && is.null(input$predictors)==0){
       tuneGrid=data.frame(mtry=c(ncol(train_dat)/3))
       )
   
+  output$train1_title <- renderText("Results from Training Data:")
   output$train1 <- renderPrint({
       train_results
       })
-  
+
+  output$train2_title <- NULL
   output$train2 <- NULL
-  
+
+  output$train_plot_title <- renderText("Variable Importance:")
   output$train_plot <- renderPlot({
       plot(varImp(train_results))
     	})  
