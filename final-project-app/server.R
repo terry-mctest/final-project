@@ -240,61 +240,110 @@ if(is.null(input$predictors)==0){
   
   # split into train vs test data
   set.seed(433)
-  indextrain <- createDataPartition(1:nrow(model_dat), p=(input$slider/100), 
+  indextrain <- createDataPartition(model_dat$quality, p=(input$slider/100), 
                                     list=FALSE)
   train_dat <- model_dat[indextrain,]
   test_dat <- model_dat[-indextrain,]
   }
   
   
-#multiple linear regression
-if(input$model_radio==1 && is.null(input$predictors)==0){
+  #multiple linear regression
+  if(input$model_radio %in% c(1,3) && is.null(input$predictors)==0){
+    
+    mlr_train_results <- train(quality ~ ., data = train_dat,
+        method="lm", 
+        preProcess=c("center","scale"),
+        trControl=trainControl(method = "cv", number = input$cv)
+        )
+    
+    mlr_test_results <- predict(mlr_train_results, newdata = test_dat)
+  }
+  
+  
+  #random forest
+  if(input$model_radio %in% c(2,3) && is.null(input$predictors)==0){
+  
+    rf_train_results <- train(quality ~ ., data = train_dat,
+        method="rf", 
+        preProcess=c("center","scale"),
+        trControl=trainControl(method = "cv", number = input$cv),
+        tuneGrid=data.frame(mtry = 
+                              c(round((ncol(train_dat)/input$div),digits=0)))
+        )
+    
+    rf_test_results <- predict(rf_train_results, newdata = test_dat)
+  }
+  
+  
+  #output assuming MLR only is selected
+  if(input$model_radio==1 && is.null(input$predictors)==0){
+    output$m1_title <- renderText("MLR Model Summary (Training Data):")
+    output$m1 <- renderPrint({summary(mlr_train_results)})
+  
+    output$m2_title <- renderText("MLR Fit Statistics (Training Data):")
+    output$m2 <- renderPrint({mlr_train_results})
 
-  train_results <- train(quality ~ ., data = train_dat,
-      method="lm", 
-      preProcess=c("center","scale"),
-      trControl=trainControl(method = "cv", number = 5)
-      )
+    output$m3_title <- renderText("MLR Fit Statistics (Test Data):")
+    output$m3 <- renderPrint({
+      postResample(mlr_test_results, obs = test_dat$quality)
+      })  
+    
+    output$m4_title <- NULL
+    output$m4 <- NULL
+  }
+  
+  
+  #output assuming RF only is selected
+  else if(input$model_radio==2 && is.null(input$predictors)==0){
+    output$m1_title <- renderText("RF Fit Statistics (Training Data):")
+    output$m1 <- renderPrint({rf_train_results})
+ 
+    output$m2_title <- renderText("RF Variable Importance (Training Data):")
+    output$m2 <- renderPrint({varImp(rf_train_results)})  
 
-  output$train1_title <- renderText("Results from Training Data:")
-  output$train1 <- renderPrint({
-      summary(train_results)
-      })
-
-  output$train2_title <- renderText("Cross-Validation:")
-  output$train2 <- renderPrint({
-      train_results
+    output$m3_title <- renderText("RF Fit Statistics (Test Data):")
+    output$m3 <- renderPrint({
+      postResample(rf_test_results, obs = test_dat$quality)     
       })
     
-  output$train_plot_title <- NULL
-  output$train_plot <- NULL
-}  
-
-
-#random forest
-else if(input$model_radio==2 && is.null(input$predictors)==0){
-
-  train_results <- train(quality ~ ., data = train_dat,
-      method="rf", 
-      preProcess=c("center","scale"),
-      trControl=trainControl(method = "cv", number = 5),
-      tuneGrid=data.frame(mtry=c(ncol(train_dat)/3))
-      )
+    output$m4_title <- NULL
+    output$m4 <- NULL
+  }
   
-  output$train1_title <- renderText("Results from Training Data:")
-  output$train1 <- renderPrint({
-      train_results
-      })
-
-  output$train2_title <- NULL
-  output$train2 <- NULL
-
-  output$train_plot_title <- renderText("Variable Importance:")
-  output$train_plot <- renderPlot({
-      plot(varImp(train_results))
-    	})  
-  }  
   
+  #output assuming MLR+RF only is selected
+  if(input$model_radio==3 && is.null(input$predictors)==0){
+    output$m1_title <- renderText("MLR Model Summary (Training Data):")
+    output$m1 <- renderPrint({summary(mlr_train_results)})
+  
+    output$m2_title <- renderText("RF Variable Importance (Training Data):")
+    output$m2 <- renderPrint({varImp(rf_train_results)})  
+
+
+    #df w/ training-data fit statistics for both MLR + RF    
+    train_compare <-
+      data.frame(t(mlr_train_results$results[,2:6]),
+                 t(rf_train_results$results[,2:6]))
+    colnames(train_compare)[1] <- 'MLR'
+    colnames(train_compare)[2] <- 'RF'
+
+    output$m3_title <- renderText("MLR vs. RF Fit Statistics (Training Data):")
+    output$m3 <- renderPrint({train_compare})  
+
+    
+    #df w/ test-data fit statistics for both MLR + RF    
+    mlr <- postResample(mlr_test_results, obs = test_dat$quality)       
+    rf <- postResample(rf_test_results, obs = test_dat$quality)
+    
+    test_compare <- bind_rows(mlr, rf)
+    rownames(test_compare)[1] <- 'MLR'
+    rownames(test_compare)[2] <- 'RF'
+
+    output$m4_title <- renderText("MLR vs. RF Fit Statistics (Test Data):")
+    output$m4 <- renderPrint({t(test_compare)})  
+  }
+  
+
   
 })
   

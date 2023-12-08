@@ -170,7 +170,6 @@ fluidPage(
         tabPanel("Modeling Info", 
           fileInput("file", "Data", buttonLabel = "Upload..."),
           textInput("delim", "Delimiter (leave blank to guess)", ""),
-          numericInput("skip", "Rows to skip", 0, min = 0),
           numericInput("rows", "Rows to preview", 10, min = 1)
         ),
 
@@ -182,17 +181,24 @@ fluidPage(
         tabPanel("Model Fitting",
           sidebarLayout(
             sidebarPanel(
-              sliderInput("slider", label="First, define the proportion of records to be randomly selected for use in model training (records not used for model training will be used for model testing):", 
-                          min=50, max=90, value=80, step=1, post="%"),
-              br(),
               radioButtons("model_radio", 
-                           "Next, select the type of model to be fit:",
-                choices = c("Multiple linear regression" = 1, 
-                            "Random forest" = 2), 
+                           "First, select the type of model to be fit:",
+                choices = c("Multiple linear regression (MLR)" = 1, 
+                            "Random forest (RF)" = 2,
+                            "Both MLR and RF" = 3), 
                 selected = 1),
               br(),
+              sliderInput("slider", label="Next, define the proportion of records to be randomly selected for use in model training (records not used for model training will be used for model testing):", 
+                          min=50, max=90, value=80, step=1, post="%"),
+              br(),
+              numericInput("cv", "Then select the desired number (between 3 and 6) of cross-validation folds:", 3, min = 3, max = 6),
+              br(),
+              conditionalPanel(condition = "input.model_radio != 1",
+                  numericInput("div", "Tunining parameter divisor:", 2, 
+                               min = 1.25, max = 5, step = 0.25)),
+              br(),
               checkboxGroupInput("predictors", 
-                    "Then select the variables to be used in modeling wine quality:",
+                    "And don't forget to select the right-side variables to be used in modeling wine quality!",
                 choices = c("fixed_acidity",# = 1, 
                             "volatile_acidity",# = 2, 
                             "citric_acid",# = 3,
@@ -209,12 +215,14 @@ fluidPage(
               actionButton("run_model", "Click here to run model")
             ),
             mainPanel(
-              strong(h3(textOutput("train1_title"))),
-              verbatimTextOutput("train1"),
-              strong(h3(textOutput("train2_title"))),
-              verbatimTextOutput("train2"),
-              strong(h3(textOutput("train_plot_title"))),
-              plotOutput("train_plot")
+              strong(h3(textOutput("m1_title"))),
+              verbatimTextOutput("m1"),
+              strong(h3(textOutput("m2_title"))),
+              verbatimTextOutput("m2"),
+              strong(h3(textOutput("m3_title"))),
+              verbatimTextOutput("m3"),
+              strong(h3(textOutput("m4_title"))),
+              verbatimTextOutput("m4")
               )
           )
         ),
