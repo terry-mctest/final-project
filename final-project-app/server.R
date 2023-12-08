@@ -232,51 +232,62 @@ else if(input$wine_type_radio != 1){
 observeEvent(input$run_model, {
 
   
-#data prep
-if(is.null(input$predictors)==0){
+#DATA PREP (allow for different predictors being selected for MLR vs. RF)
+  
+#multiple linear regression
+if(input$model_radio %in% c(1,3) && is.null(input$mlr_preds)==0){
 
   #subset data to selected variables
-  model_dat <- red_and_white %>% select(quality, input$predictors)
+  mlr_dat <- red_and_white %>% select(quality, input$mlr_preds)
   
-  # split into train vs test data
+  #split into train vs test data
   set.seed(433)
-  indextrain <- createDataPartition(model_dat$quality, p=(input$slider/100), 
+  mlr_index <- createDataPartition(mlr_dat$quality, p=(input$slider/100), 
                                     list=FALSE)
-  train_dat <- model_dat[indextrain,]
-  test_dat <- model_dat[-indextrain,]
-  }
-  
-  
-  #multiple linear regression
-  if(input$model_radio %in% c(1,3) && is.null(input$predictors)==0){
-    
-    mlr_train_results <- train(quality ~ ., data = train_dat,
+  mlr_train_dat <- mlr_dat[mlr_index,]
+  mlr_test_dat <- mlr_dat[-mlr_index,]
+
+    #train on training data
+    mlr_train_results <- train(quality ~ ., data = mlr_train_dat,
         method="lm", 
         preProcess=c("center","scale"),
         trControl=trainControl(method = "cv", number = input$cv)
         )
     
-    mlr_test_results <- predict(mlr_train_results, newdata = test_dat)
-  }
+    #test on testing data
+    mlr_test_results <- predict(mlr_train_results, newdata = mlr_test_dat)
+}
   
   
-  #random forest
-  if(input$model_radio %in% c(2,3) && is.null(input$predictors)==0){
+#random forest
+if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
   
-    rf_train_results <- train(quality ~ ., data = train_dat,
+  #subset data to selected variables
+  rf_dat <- red_and_white %>% select(quality, input$rf_preds)
+  
+  #split into train vs test data
+  set.seed(433)
+  rf_index <- createDataPartition(rf_dat$quality, p=(input$slider/100), 
+                                    list=FALSE)
+  rf_train_dat <- rf_dat[rf_index,]
+  rf_test_dat <- rf_dat[-rf_index,]
+
+    rf_train_results <- train(quality ~ ., data = rf_train_dat,
         method="rf", 
         preProcess=c("center","scale"),
         trControl=trainControl(method = "cv", number = input$cv),
         tuneGrid=data.frame(mtry = 
-                              c(round((ncol(train_dat)/input$div),digits=0)))
+                              c(round((ncol(rf_train_dat)/input$div),digits=0)))
         )
     
-    rf_test_results <- predict(rf_train_results, newdata = test_dat)
-  }
+    rf_test_results <- predict(rf_train_results, newdata = rf_test_dat)
+}
   
+
+#OUTPUT
   
-  #output assuming MLR only is selected
-  if(input$model_radio==1 && is.null(input$predictors)==0){
+#output assuming MLR only is selected
+if(input$model_radio==1 && is.null(input$mlr_preds)==0){
     output$m1_title <- renderText("MLR Model Summary (Training Data):")
     output$m1 <- renderPrint({summary(mlr_train_results)})
   
@@ -285,16 +296,16 @@ if(is.null(input$predictors)==0){
 
     output$m3_title <- renderText("MLR Fit Statistics (Test Data):")
     output$m3 <- renderPrint({
-      postResample(mlr_test_results, obs = test_dat$quality)
+      postResample(mlr_test_results, obs = mlr_test_dat$quality)
       })  
     
     output$m4_title <- NULL
     output$m4 <- NULL
-  }
+}
   
   
-  #output assuming RF only is selected
-  else if(input$model_radio==2 && is.null(input$predictors)==0){
+#output assuming RF only is selected
+else if(input$model_radio==2 && is.null(input$rf_preds)==0){
     output$m1_title <- renderText("RF Fit Statistics (Training Data):")
     output$m1 <- renderPrint({rf_train_results})
  
@@ -303,16 +314,17 @@ if(is.null(input$predictors)==0){
 
     output$m3_title <- renderText("RF Fit Statistics (Test Data):")
     output$m3 <- renderPrint({
-      postResample(rf_test_results, obs = test_dat$quality)     
+      postResample(rf_test_results, obs = rf_test_dat$quality)     
       })
     
     output$m4_title <- NULL
     output$m4 <- NULL
-  }
+}
   
   
-  #output assuming MLR+RF only is selected
-  if(input$model_radio==3 && is.null(input$predictors)==0){
+#output assuming MLR+RF only is selected
+if(input$model_radio==3 && is.null(input$mlr_preds)==0 && is.null(input$rf_preds)==0){
+    
     output$m1_title <- renderText("MLR Model Summary (Training Data):")
     output$m1 <- renderPrint({summary(mlr_train_results)})
   
@@ -332,8 +344,8 @@ if(is.null(input$predictors)==0){
 
     
     #df w/ test-data fit statistics for both MLR + RF    
-    mlr <- postResample(mlr_test_results, obs = test_dat$quality)       
-    rf <- postResample(rf_test_results, obs = test_dat$quality)
+    mlr <- postResample(mlr_test_results, obs = mlr_test_dat$quality)       
+    rf <- postResample(rf_test_results, obs = rf_test_dat$quality)
     
     test_compare <- bind_rows(mlr, rf)
     rownames(test_compare)[1] <- 'MLR'
@@ -341,7 +353,7 @@ if(is.null(input$predictors)==0){
 
     output$m4_title <- renderText("MLR vs. RF Fit Statistics (Test Data):")
     output$m4 <- renderPrint({t(test_compare)})  
-  }
+}
   
 
   
