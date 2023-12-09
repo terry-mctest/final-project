@@ -292,8 +292,7 @@ if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
   rf_test_dat <- rf_dat[-rf_index,]
 
 
-  #withProgress(message = "Fitting model, thanks for your patience...",{  
-  
+  withProgress(message = "Fitting model, thanks for your patience...",{  
     rf_train_results <- train(quality ~ ., data = rf_train_dat,
         method="rf", 
         preProcess=c("center","scale"),
@@ -306,14 +305,15 @@ if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
         )
     
     rf_test_results <- predict(rf_train_results, newdata = rf_test_dat)
-  #})
+    
+    #facilitate display of progress bar    
+    for (i in 1:15) {
+    incProgress(1/15)
+    Sys.sleep(0.25)
+    }
+  })
 }
 
-#facilitate display of progress bar    
-#for (i in 1:15) {
-#incProgress(1/15)
-#Sys.sleep(0.25)
-#}
     
   
 
@@ -412,7 +412,9 @@ else if(input$model_radio==3 &&
     output$m4_title <- NULL
     output$m4 <- NULL
 }   
-  
+
+#reset value of action button 
+input$run_model==0
 })
   
   

@@ -10,7 +10,16 @@
 
 
 library(shiny)
+library(shinyjs)
+library(readr)
+library(janitor)
 
+    #data for red+white wines
+    red_and_white <- data.frame(read_csv("winequality-full.csv"))
+    red_and_white <- clean_names(red_and_white)
+    red_and_white$type <- as.factor(red_and_white$type)
+
+    
 
 
 fluidPage(
