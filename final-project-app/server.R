@@ -16,7 +16,7 @@ library(dplyr)
 library(stringr)
 library(caret)
 library(randomForest)
-# library(car)
+library(shinyjs)
 
 
 
@@ -154,7 +154,8 @@ if(input$plot_type_radio==1 && input$wine_type_radio==1){
     	geom_jitter() + geom_smooth(method = "lm") + 
       labs(y = "Wine Quality Rating",
            title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
-                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(str_to_upper(aes_string(input$q_dropdown))))) +
+                          (aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
 }
@@ -167,7 +168,8 @@ else if(input$plot_type_radio==1 && input$wine_type_radio != 1){
       labs(y = "Wine Quality Rating",
            title = 
              paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
-                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(str_to_upper(aes_string(input$q_dropdown))))) +
+                          (aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
 }
@@ -181,7 +183,8 @@ else if(input$plot_type_radio==2 && input$wine_type_radio==1){
       facet_wrap(~type) +
       labs(y = "Wine Quality Rating",
            title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
-                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(str_to_upper(aes_string(input$q_dropdown))))) +
+                          (aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
 }
@@ -195,7 +198,8 @@ else if(input$plot_type_radio==2 && input$wine_type_radio != 1){
       labs(y = "Wine Quality Rating", 
            title = 
              paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
-                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(str_to_upper(aes_string(input$q_dropdown))))) +
+                          (aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
   
@@ -231,8 +235,23 @@ else if(input$wine_type_radio != 1){
  
 observeEvent(input$run_model, {
 
+#jump to top of output screen
+shinyjs::runjs("window.scrollTo(0, 0)")
   
-#DATA PREP (allow for different predictors being selected for MLR vs. RF)
+#grey out results of previous model run (if any)
+output$m1_title <- NULL
+output$m1 <- NULL
+output$m2_title <- NULL
+output$m2 <- NULL
+output$m3_title <- NULL
+output$m3 <- NULL
+output$m4_title <- NULL
+output$m4 <- NULL
+  
+  
+  
+#PREP DATA and RUN MODELS
+#(allow for different predictors being selected for MLR vs. RF)
   
 #multiple linear regression
 if(input$model_radio %in% c(1,3) && is.null(input$mlr_preds)==0){
@@ -272,16 +291,30 @@ if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
   rf_train_dat <- rf_dat[rf_index,]
   rf_test_dat <- rf_dat[-rf_index,]
 
+
+  #withProgress(message = "Fitting model, thanks for your patience...",{  
+  
     rf_train_results <- train(quality ~ ., data = rf_train_dat,
         method="rf", 
         preProcess=c("center","scale"),
         trControl=trainControl(method = "cv", number = input$cv),
         tuneGrid=data.frame(mtry = 
                               c(round((ncol(rf_train_dat)/input$div),digits=0)))
+        #setting up tuning parameter in this way so as to (1) constrain the
+        #tuning parameter (for the sake of constraining run times), and (2)             #avoid complications re: tuning parameter that is greater than the
+        #number of predictor variables selected
         )
     
     rf_test_results <- predict(rf_train_results, newdata = rf_test_dat)
+  #})
 }
+
+#facilitate display of progress bar    
+#for (i in 1:15) {
+#incProgress(1/15)
+#Sys.sleep(0.25)
+#}
+    
   
 
 #OUTPUT
@@ -356,6 +389,29 @@ if(input$model_radio==3 && is.null(input$mlr_preds)==0 && is.null(input$rf_preds
 }
   
 
+#if "run model" has been clicked, but no predictors are selected
+if((input$model_radio==1 && is.null(input$mlr_preds)==1) |
+   (input$model_radio==2 && is.null(input$rf_preds)==1)){
+    output$m1_title <- NULL
+    output$m1 <- NULL
+    output$m2_title <- renderText("Sorry, please select right-side variables for your model!")
+    output$m2 <- NULL
+    output$m3_title <- NULL
+    output$m3 <- NULL
+    output$m4_title <- NULL
+    output$m4 <- NULL
+  }  
+else if(input$model_radio==3 && 
+        (is.null(input$mlr_preds)==1 | is.null(input$rf_preds)==1)){
+    output$m1_title <- NULL
+    output$m1 <- NULL
+    output$m2_title <- renderText("Sorry, please select right-side variables for both your MLR and your RF model!")
+    output$m2 <- NULL
+    output$m3_title <- NULL
+    output$m3 <- NULL
+    output$m4_title <- NULL
+    output$m4 <- NULL
+}   
   
 })
   

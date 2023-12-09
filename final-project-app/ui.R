@@ -11,6 +11,8 @@
 
 library(shiny)
 
+
+
 fluidPage(
   
   theme = bslib::bs_theme(bootswatch = "morph"),
@@ -55,7 +57,7 @@ fluidPage(
           tags$ul(
             tags$li(tags$i("Modeling info:"),""),
             tags$li(tags$i("Model fitting:"),""),
-            tags$li(tags$i("Prediction:"),""),
+            tags$li(tags$i("Prediction:"),"")
           ),
       ),
       h2("this is h2"),
@@ -167,10 +169,7 @@ fluidPage(
         # *MODELING INFO* (sub)TAB #
         ############################
         
-        tabPanel("Modeling Info", 
-          fileInput("file", "Data", buttonLabel = "Upload..."),
-          textInput("delim", "Delimiter (leave blank to guess)", ""),
-          numericInput("rows", "Rows to preview", 10, min = 1)
+        tabPanel("Modeling Info" 
         ),
 
                         
@@ -182,6 +181,7 @@ fluidPage(
           titlePanel(h2("MODELING WINE QUALITY", align="center")),
           sidebarLayout(
             sidebarPanel(
+              useShinyjs(), #allow for jumping to the top of mainpanel output
               radioButtons("model_radio", 
                            "First, select the type of model to be fit:",
                 choices = c("Multiple linear regression (MLR)" = 1, 
@@ -234,14 +234,14 @@ fluidPage(
               actionButton("run_model", "Click here to run model")
             ),
             mainPanel(
-              strong(h3(textOutput("m1_title"))),
-              verbatimTextOutput("m1"),
-              strong(h3(textOutput("m2_title"))),
-              verbatimTextOutput("m2"),
-              strong(h3(textOutput("m3_title"))),
-              verbatimTextOutput("m3"),
-              strong(h3(textOutput("m4_title"))),
-              verbatimTextOutput("m4")
+                strong(h3(textOutput("m1_title"))),
+                verbatimTextOutput("m1"),
+                strong(h3(textOutput("m2_title"))),
+                verbatimTextOutput("m2"),
+                strong(h3(textOutput("m3_title"))),
+                verbatimTextOutput("m3"),
+                strong(h3(textOutput("m4_title"))),
+                verbatimTextOutput("m4")
               )
           )
         ),
@@ -251,7 +251,58 @@ fluidPage(
         # *PREDICTION* (sub)TAB #
         #########################
         
-        tabPanel("Prediction"
+        tabPanel("Prediction",
+          titlePanel(h2("PREDICTING WINE QUALITY", align="center")),
+          strong('If you have already fit a model on the "Model Fitting" tab, you can then predict wine quality for a specific wine by selecting the feature values of said wine using the inputs to follow (each feature below is initialized to its mean value in the wine quality data); after doing so, click on "Predict Wine Quality" to obtain wine quality rating(s) as predicted by your model(s).'),
+          sidebarLayout(
+            sidebarPanel(
+              
+              #--initialize predictor vars to mean value in our input data
+              #--dont constrain to actual min/max, but constrain to values which
+              #  are "just outside" the actual min/max
+              #--adjust "steps" and "digits" based on values in the input data
+              
+              numericInput("fixed_acidity_p", "fixed acidity:", 
+                           round(mean(red_and_white$fixed_acidity),digits=1), 
+                           min = 0, max = 20, step = 0.1),
+              numericInput("volatile_acidity_p", "volatile acidity:", 
+                           round(mean(red_and_white$volatile_acidity),digits=1),
+                           min = 0, max = 2, step = 0.1),
+              numericInput("citric_acid_p", "citric acid:",
+                           round(mean(red_and_white$citric_acid),digits=1), 
+                           min = 0, max = 2, step = 0.1),
+              numericInput("residual_sugar_p", "residual sugar:", 
+                           round(mean(red_and_white$residual_sugar),digits=1), 
+                           min = 0, max = 70, step = 1),
+              numericInput("chlorides_p", "chlorides:",
+                           round(mean(red_and_white$chlorides),digits=1), 
+                           min = 0, max = 1, step = 0.1),
+              numericInput("free_sulfur_dioxide_p", "free sulfur dioxide:", 
+                           round(mean(red_and_white$free_sulfur_dioxide),
+                                 digits=0), 
+                           min = 0, max = 300, step = 1),
+              numericInput("total_sulfur_dioxide_p", "total sulfur dioxide:", 
+                           round(mean(red_and_white$total_sulfur_dioxide),
+                                 digits=0), 
+                           min = 0, max = 500, step = 1),
+              numericInput("density_p", "density:", 
+                           round(mean(red_and_white$density),digits=3), 
+                           min = 0, max = 1.5, step = 0.001),
+              numericInput("p_h_p", "pH:",
+                           round(mean(red_and_white$p_h),digits=1), 
+                           min = 1, max = 5, step = 0.1),
+              numericInput("sulphates_p", "sulphates:",
+                           round(mean(red_and_white$sulphates),digits=1), 
+                           min = 0, max = 2, step = 0.1),
+              numericInput("alcohol_p", "alcohol:", 
+                           round(mean(red_and_white$alcohol),digits=1), 
+                           min = 0, max = 15, step = 0.1),
+              selectInput("type_p", "Type:", choices = c("Red", "White")),
+              actionButton("predict", "Predict Wine Quality")
+            ),
+            mainPanel(
+            )
+          )
         )
       )
     )
