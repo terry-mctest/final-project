@@ -205,7 +205,7 @@ fluidPage(
               br(),
               conditionalPanel(condition = "input.model_radio != 1",
                   numericInput("div", "RF tuning parameter divisor:", 2, 
-                               min = 1.25, max = 5, step = 0.25)),
+                               min = 1, max = 5, step = 0.25)),
               br(),
               conditionalPanel(condition = "input.model_radio != 2",
                 checkboxGroupInput("mlr_preds", 

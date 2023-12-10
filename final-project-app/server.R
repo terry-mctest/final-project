@@ -147,7 +147,7 @@ else if(input$bd_radio==4){
 #############################################
 
 #scatter/jitterplot w/disaggegation by type
-if(input$plot_type_radio==1 && input$wine_type_radio==1){
+if(input$plot_type_radio==1 & input$wine_type_radio==1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), y=quality, 
                                      color=type, position="jitter")) + 
@@ -161,7 +161,7 @@ if(input$plot_type_radio==1 && input$wine_type_radio==1){
 }
 
 #scatter/jitterplot w/o disaggegation by type
-else if(input$plot_type_radio==1 && input$wine_type_radio != 1){
+else if(input$plot_type_radio==1 & input$wine_type_radio != 1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), y=quality)) + 
     	geom_jitter() + geom_smooth(method = "lm") + 
@@ -175,7 +175,7 @@ else if(input$plot_type_radio==1 && input$wine_type_radio != 1){
 }
   
 #boxplot w/disaggregation by type
-else if(input$plot_type_radio==2 && input$wine_type_radio==1){
+else if(input$plot_type_radio==2 & input$wine_type_radio==1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), 
                                      y = as.factor(quality))) + 
@@ -190,7 +190,7 @@ else if(input$plot_type_radio==2 && input$wine_type_radio==1){
 }
 
 #boxplot w/o disaggregation by type
-else if(input$plot_type_radio==2 && input$wine_type_radio != 1){
+else if(input$plot_type_radio==2 & input$wine_type_radio != 1){
   output$q_plot <- renderPlot({
       ggplot(data=red_and_white, aes(x=!!sym(input$q_dropdown), 
                                      y = as.factor(quality))) + 
@@ -239,14 +239,14 @@ observeEvent(input$run_model, {
 shinyjs::runjs("window.scrollTo(0, 0)")
   
 #grey out results of previous model run (if any)
-output$m1_title <- NULL
-output$m1 <- NULL
-output$m2_title <- NULL
-output$m2 <- NULL
-output$m3_title <- NULL
-output$m3 <- NULL
-output$m4_title <- NULL
-output$m4 <- NULL
+#output$m1_title <- NULL
+#output$m1 <- NULL
+#output$m2_title <- NULL
+#output$m2 <- NULL
+#output$m3_title <- NULL
+#output$m3 <- NULL
+#output$m4_title <- NULL
+#output$m4 <- NULL
   
   
   
@@ -254,7 +254,7 @@ output$m4 <- NULL
 #(allow for different predictors being selected for MLR vs. RF)
   
 #multiple linear regression
-if(input$model_radio %in% c(1,3) && is.null(input$mlr_preds)==0){
+if(input$model_radio %in% c(1,3) & is.null(input$mlr_preds)==0){
 
   #subset data to selected variables
   mlr_dat <- red_and_white %>% select(quality, input$mlr_preds)
@@ -279,7 +279,7 @@ if(input$model_radio %in% c(1,3) && is.null(input$mlr_preds)==0){
   
   
 #random forest
-if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
+if(input$model_radio %in% c(2,3) & is.null(input$rf_preds)==0){
   
   #subset data to selected variables
   rf_dat <- red_and_white %>% select(quality, input$rf_preds)
@@ -291,27 +291,31 @@ if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
   rf_train_dat <- rf_dat[rf_index,]
   rf_test_dat <- rf_dat[-rf_index,]
 
+  #tuning parameter divisor
+  #setting up tuning parameter in this way so as to avoid complications 
+  #re: tuning parameter that is greater than the number of predictor
+  #variables selected
+  if(ncol(rf_train_dat)==2){mtry_value <- 1}
+  else if(ncol(rf_train_dat) > 2){
+    mtry_value <- (round((ncol(rf_train_dat)/input$div),digits=0))}
 
-  withProgress(message = "Fitting model, thanks for your patience...",{  
+    
+  #withProgress(message = "Fitting model, thanks for your patience...",{  
     rf_train_results <- train(quality ~ ., data = rf_train_dat,
         method="rf", 
         preProcess=c("center","scale"),
         trControl=trainControl(method = "cv", number = input$cv),
-        tuneGrid=data.frame(mtry = 
-                              c(round((ncol(rf_train_dat)/input$div),digits=0)))
-        #setting up tuning parameter in this way so as to (1) constrain the
-        #tuning parameter (for the sake of constraining run times), and (2)             #avoid complications re: tuning parameter that is greater than the
-        #number of predictor variables selected
+        tuneGrid=data.frame(mtry = mtry_value)
         )
     
     rf_test_results <- predict(rf_train_results, newdata = rf_test_dat)
     
     #facilitate display of progress bar    
-    for (i in 1:15) {
-    incProgress(1/15)
-    Sys.sleep(0.25)
-    }
-  })
+    #for (i in 1:15) {
+    #incProgress(1/15)
+    #Sys.sleep(0.25)
+    #}
+  #})
 }
 
     
@@ -320,7 +324,7 @@ if(input$model_radio %in% c(2,3) && is.null(input$rf_preds)==0){
 #OUTPUT
   
 #output assuming MLR only is selected
-if(input$model_radio==1 && is.null(input$mlr_preds)==0){
+if(input$model_radio==1 & is.null(input$mlr_preds)==0){
     output$m1_title <- renderText("MLR Model Summary (Training Data):")
     output$m1 <- renderPrint({summary(mlr_train_results)})
   
@@ -338,7 +342,7 @@ if(input$model_radio==1 && is.null(input$mlr_preds)==0){
   
   
 #output assuming RF only is selected
-else if(input$model_radio==2 && is.null(input$rf_preds)==0){
+else if(input$model_radio==2 & is.null(input$rf_preds)==0){
     output$m1_title <- renderText("RF Fit Statistics (Training Data):")
     output$m1 <- renderPrint({rf_train_results})
  
@@ -356,7 +360,7 @@ else if(input$model_radio==2 && is.null(input$rf_preds)==0){
   
   
 #output assuming MLR+RF only is selected
-if(input$model_radio==3 && is.null(input$mlr_preds)==0 && is.null(input$rf_preds)==0){
+else if(input$model_radio==3 & is.null(input$mlr_preds)==0 & is.null(input$rf_preds)==0){
     
     output$m1_title <- renderText("MLR Model Summary (Training Data):")
     output$m1 <- renderPrint({summary(mlr_train_results)})
@@ -390,22 +394,22 @@ if(input$model_radio==3 && is.null(input$mlr_preds)==0 && is.null(input$rf_preds
   
 
 #if "run model" has been clicked, but no predictors are selected
-if((input$model_radio==1 && is.null(input$mlr_preds)==1) |
-   (input$model_radio==2 && is.null(input$rf_preds)==1)){
-    output$m1_title <- NULL
+else if((input$model_radio==1 & is.null(input$mlr_preds)==1) |
+   (input$model_radio==2 & is.null(input$rf_preds)==1)){
+    output$m1_title <- renderText("Sorry, please select right-side variables for your model!")
     output$m1 <- NULL
-    output$m2_title <- renderText("Sorry, please select right-side variables for your model!")
+    output$m2_title <- NULL
     output$m2 <- NULL
     output$m3_title <- NULL
     output$m3 <- NULL
     output$m4_title <- NULL
     output$m4 <- NULL
   }  
-else if(input$model_radio==3 && 
+else if(input$model_radio==3 & 
         (is.null(input$mlr_preds)==1 | is.null(input$rf_preds)==1)){
-    output$m1_title <- NULL
+    output$m1_title <- renderText("Sorry, please select right-side variables for your model!")
     output$m1 <- NULL
-    output$m2_title <- renderText("Sorry, please select right-side variables for both your MLR and your RF model!")
+    output$m2_title <- NULL
     output$m2 <- NULL
     output$m3_title <- NULL
     output$m3 <- NULL
@@ -414,7 +418,7 @@ else if(input$model_radio==3 &&
 }   
 
 #reset value of action button 
-input$run_model==0
+#input$run_model==0
 })
   
   
