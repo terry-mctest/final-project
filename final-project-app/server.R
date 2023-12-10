@@ -37,13 +37,15 @@ library(shinyjs)
 
 shinyServer(function(input, output, session) {
 
-observe({
+
 
     
 #################################  
 # *BASIC DESCRIPTIVES* (sub)TAB #
 #################################
 
+observe({
+  
 #results for *type* var (all other vars are continuous)
 if(input$bd_dropdown=="type"){
   #output plot
@@ -138,7 +140,8 @@ else if(input$bd_radio==4){
       tibble::tibble(!!!summary(red_and_white[,input$bd_dropdown]))
   })
 }
-
+  
+})
   
   
   
@@ -146,6 +149,8 @@ else if(input$bd_radio==4){
 # *ASSOCIATIONS WITH WINE QUALITY* (sub)TAB #
 #############################################
 
+observe({
+  
 #scatter/jitterplot w/disaggegation by type
 if(input$plot_type_radio==1 & input$wine_type_radio==1){
   output$q_plot <- renderPlot({
@@ -227,6 +232,8 @@ else if(input$wine_type_radio != 1){
       })
 }  
 
+})
+  
 
   
 ############################
@@ -235,18 +242,23 @@ else if(input$wine_type_radio != 1){
  
 observeEvent(input$run_model, {
 
+  
 #jump to top of output screen
 shinyjs::runjs("window.scrollTo(0, 0)")
   
 #grey out results of previous model run (if any)
-#output$m1_title <- NULL
-#output$m1 <- NULL
-#output$m2_title <- NULL
-#output$m2 <- NULL
-#output$m3_title <- NULL
-#output$m3 <- NULL
-#output$m4_title <- NULL
-#output$m4 <- NULL
+output$m1_title <- NULL
+output$m1 <- NULL
+output$m2_title <- NULL
+output$m2 <- NULL
+output$m3_title <- NULL
+output$m3 <- NULL
+output$m4_title <- NULL
+output$m4 <- NULL
+
+mlr_train_results <- NULL
+rf_train_results <- NULL
+
   
   
   
@@ -300,7 +312,7 @@ if(input$model_radio %in% c(2,3) & is.null(input$rf_preds)==0){
     mtry_value <- (round((ncol(rf_train_dat)/input$div),digits=0))}
 
     
-  #withProgress(message = "Fitting model, thanks for your patience...",{  
+  withProgress(message = "Fitting model, thanks for your patience...",{  
     rf_train_results <- train(quality ~ ., data = rf_train_dat,
         method="rf", 
         preProcess=c("center","scale"),
@@ -311,11 +323,11 @@ if(input$model_radio %in% c(2,3) & is.null(input$rf_preds)==0){
     rf_test_results <- predict(rf_train_results, newdata = rf_test_dat)
     
     #facilitate display of progress bar    
-    #for (i in 1:15) {
-    #incProgress(1/15)
-    #Sys.sleep(0.25)
-    #}
-  #})
+    for (i in 1:15) {
+    incProgress(1/15)
+    Sys.sleep(0.25)
+    }
+  })
 }
 
     
@@ -417,17 +429,69 @@ else if(input$model_radio==3 &
     output$m4 <- NULL
 }   
 
-#reset value of action button 
-#input$run_model==0
-})
-  
+
   
   
 #########################
 # *PREDICTION* (sub)TAB #
 #########################  
+
+if(input$model_radio %in% c(1,3) & is.null(mlr_train_results)==0){
+  mlr_pred <- predict(mlr_train_results, new_data=
+                        data.frame(
+                          fixed_acidity = input$fixed_acidity_p,
+                          volatile_acidity = input$volatile_acidity_p,
+                          citric_acid = input$citric_acid_p,
+                          residual_sugar = input$residual_sugar_p,
+                          chlorides = input$chlorides_p,
+                          free_sulfur_dioxide = input$free_sulfur_dioxide_p,
+                          total_sulfur_dioxide = input$total_sulfur_dioxide_p,
+                          density = input$density_p,
+                          p_h = input$p_h_p,
+                          sulphates = input$sulphates_p,
+                          alcohol = input$alcohol_p,
+                          type = input$type_p),
+                     se.fit = TRUE, interval = "confidence")
+  }
+
   
-   
+if(input$model_radio %in% c(2,3) & is.null(rf_train_results)==0){
+  rf_pred <- predict(rf_train_results, new_data=
+                        data.frame(
+                          fixed_acidity = input$fixed_acidity_p,
+                          volatile_acidity = input$volatile_acidity_p,
+                          citric_acid = input$citric_acid_p,
+                          residual_sugar = input$residual_sugar_p,
+                          chlorides = input$chlorides_p,
+                          free_sulfur_dioxide = input$free_sulfur_dioxide_p,
+                          total_sulfur_dioxide = input$total_sulfur_dioxide_p,
+                          density = input$density_p,
+                          p_h = input$p_h_p,
+                          sulphates = input$sulphates_p,
+                          alcohol = input$alcohol_p,
+                          type = input$type_p),
+                     se.fit = TRUE, interval = "confidence")
+  }
+
+
+observeEvent(input$predict, {
+
+  if(input$model_radio %in% c(1,3) & is.null(mlr_train_results)==0){
+    output$p1_title <- renderText("Predicted Wine Quality per MLR Model")
+    output$p1 <- renderPrint({mlr_pred})
+    }
+
+  
+  if(input$model_radio %in% c(2,3) & is.null(rf_train_results)==0){
+    output$p2_title <- renderText("Predicted Wine Quality per RF Model")
+    output$p2 <- renderPrint({rf_pred})
+    }    
+  
 })
+
+})
+
+
+
 
 })
