@@ -262,15 +262,18 @@ fluidPage(
         
         tabPanel("Prediction",
           titlePanel(h2("PREDICTING WINE QUALITY", align="center")),
-          strong('If you have already fit a model on the "Model Fitting" tab, you can then predict wine quality for a specific wine by selecting the feature values of said wine using the inputs to follow (each feature below is initialized to its mean value in the wine quality data); after doing so, click on "Predict Wine Quality" to obtain wine quality rating(s) as predicted by your model(s). Predictions will be made per the most recent MLR model and/or the most RF model which you fit on the "Model Fitting" tab.'),
+          'If you have already fit a model on the "Model Fitting" tab, you can then predict wine quality for a specific wine by selecting the feature values of said wine using the inputs in the left-hand panel to follow (each feature below is initialized to its mean value in the wine quality data); after selecting feature values, click on "Predict Wine Quality" to obtain wine quality rating(s) as predicted by your model(s). Predictions will be made per the most recent MLR model and/or the most RF model which you fit on the "Model Fitting" tab.',
           sidebarLayout(
             sidebarPanel(
+              useShinyjs(), #allow for jumping to the top of mainpanel output
               
               #--initialize predictor vars to mean value in our input data
               #--dont constrain to actual min/max, but constrain to values which
               #  are "just outside" the actual min/max
               #--adjust "steps" and "digits" based on values in the input data
               
+              strong(h5("Select feature values:")),
+              br(),
               numericInput("fixed_acidity_p", "fixed acidity:", 
                            round(mean(red_and_white$fixed_acidity),digits=1), 
                            min = 0, max = 20, step = 0.1),
@@ -311,9 +314,13 @@ fluidPage(
             ),
             mainPanel(
                 strong(h3(textOutput("p1_title"))),
-                verbatimTextOutput("p1"),
+                tableOutput("p1"),
                 strong(h3(textOutput("p2_title"))),
-                verbatimTextOutput("p2"),
+                tableOutput("p2"),
+                strong(h3(textOutput("p3_title"))),
+                tableOutput("p3"),
+                strong(h3(textOutput("p4_title"))),
+                tableOutput("p4"),
             )
           )
         )

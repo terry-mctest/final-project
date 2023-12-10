@@ -159,8 +159,8 @@ if(input$plot_type_radio==1 & input$wine_type_radio==1){
     	geom_jitter() + geom_smooth(method = "lm") + 
       labs(y = "Wine Quality Rating",
            title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
-                          #(str_to_upper(aes_string(input$q_dropdown))))) +
-                          (aes_string(input$q_dropdown)))) +
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
 }
@@ -173,8 +173,8 @@ else if(input$plot_type_radio==1 & input$wine_type_radio != 1){
       labs(y = "Wine Quality Rating",
            title = 
              paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
-                          #(str_to_upper(aes_string(input$q_dropdown))))) +
-                          (aes_string(input$q_dropdown)))) +
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
 }
@@ -188,8 +188,8 @@ else if(input$plot_type_radio==2 & input$wine_type_radio==1){
       facet_wrap(~type) +
       labs(y = "Wine Quality Rating",
            title = paste0("WINE QUALITY RATING, by WINE TYPE and ",
-                          #(str_to_upper(aes_string(input$q_dropdown))))) +
-                          (aes_string(input$q_dropdown)))) +
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
 }
@@ -203,8 +203,8 @@ else if(input$plot_type_radio==2 & input$wine_type_radio != 1){
       labs(y = "Wine Quality Rating", 
            title = 
              paste0("ALL WINES (both red & white): WINE QUALITY RATING by ",
-                          #(str_to_upper(aes_string(input$q_dropdown))))) +
-                          (aes_string(input$q_dropdown)))) +
+                          (str_to_upper(aes_string(input$q_dropdown))))) +
+                          #(aes_string(input$q_dropdown)))) +
       theme(plot.title = element_text(face="bold", size=16))
     	})
   
@@ -408,7 +408,7 @@ else if(input$model_radio==3 & is.null(input$mlr_preds)==0 & is.null(input$rf_pr
 #if "run model" has been clicked, but no predictors are selected
 else if((input$model_radio==1 & is.null(input$mlr_preds)==1) |
    (input$model_radio==2 & is.null(input$rf_preds)==1)){
-    output$m1_title <- renderText("Sorry, please select right-side variables for your model!")
+    output$m1_title <- renderText("Please select right-side variables for your model!")
     output$m1 <- NULL
     output$m2_title <- NULL
     output$m2 <- NULL
@@ -419,7 +419,7 @@ else if((input$model_radio==1 & is.null(input$mlr_preds)==1) |
   }  
 else if(input$model_radio==3 & 
         (is.null(input$mlr_preds)==1 | is.null(input$rf_preds)==1)){
-    output$m1_title <- renderText("Sorry, please select right-side variables for your model!")
+    output$m1_title <- renderText("please select right-side variables for your model!")
     output$m1 <- NULL
     output$m2_title <- NULL
     output$m2 <- NULL
@@ -436,61 +436,95 @@ else if(input$model_radio==3 &
 # *PREDICTION* (sub)TAB #
 #########################  
 
-if(input$model_radio %in% c(1,3) & is.null(mlr_train_results)==0){
-  mlr_pred <- predict(mlr_train_results, new_data=
-                        data.frame(
-                          fixed_acidity = input$fixed_acidity_p,
-                          volatile_acidity = input$volatile_acidity_p,
-                          citric_acid = input$citric_acid_p,
-                          residual_sugar = input$residual_sugar_p,
-                          chlorides = input$chlorides_p,
-                          free_sulfur_dioxide = input$free_sulfur_dioxide_p,
-                          total_sulfur_dioxide = input$total_sulfur_dioxide_p,
-                          density = input$density_p,
-                          p_h = input$p_h_p,
-                          sulphates = input$sulphates_p,
-                          alcohol = input$alcohol_p,
-                          type = input$type_p),
-                     se.fit = TRUE, interval = "confidence")
-  }
-
-  
-if(input$model_radio %in% c(2,3) & is.null(rf_train_results)==0){
-  rf_pred <- predict(rf_train_results, new_data=
-                        data.frame(
-                          fixed_acidity = input$fixed_acidity_p,
-                          volatile_acidity = input$volatile_acidity_p,
-                          citric_acid = input$citric_acid_p,
-                          residual_sugar = input$residual_sugar_p,
-                          chlorides = input$chlorides_p,
-                          free_sulfur_dioxide = input$free_sulfur_dioxide_p,
-                          total_sulfur_dioxide = input$total_sulfur_dioxide_p,
-                          density = input$density_p,
-                          p_h = input$p_h_p,
-                          sulphates = input$sulphates_p,
-                          alcohol = input$alcohol_p,
-                          type = input$type_p),
-                     se.fit = TRUE, interval = "confidence")
-  }
-
-
 observeEvent(input$predict, {
+  
+#jump to top of output screen
+shinyjs::runjs("window.scrollTo(0, 0)")
 
-  if(input$model_radio %in% c(1,3) & is.null(mlr_train_results)==0){
-    output$p1_title <- renderText("Predicted Wine Quality per MLR Model")
-    output$p1 <- renderPrint({mlr_pred})
-    }
+#user-inputted prediction data
+to_be_pred <- data.frame(
+                          fixed_acidity = input$fixed_acidity_p,
+                          volatile_acidity = input$volatile_acidity_p,
+                          citric_acid = input$citric_acid_p,
+                          residual_sugar = input$residual_sugar_p,
+                          chlorides = input$chlorides_p,
+                          free_sulfur_dioxide = input$free_sulfur_dioxide_p,
+                          total_sulfur_dioxide = input$total_sulfur_dioxide_p,
+                          density = input$density_p,
+                          p_h = input$p_h_p,
+                          sulphates = input$sulphates_p,
+                          alcohol = input$alcohol_p,
+                          type = input$type_p)
+
+
+if(input$model_radio==1 & is.null(mlr_train_results)==0){
+  mlr_pred <- predict(mlr_train_results, newdata=to_be_pred,
+                     se.mlr_train_results = TRUE, interval = "confidence")
+  
+  output$p1_title <- renderText("Predicted Wine Quality per MLR Model:")
+  output$p1 <- renderTable(mlr_pred, colnames=FALSE)
+  output$p2_title <- renderText("MLR Predictor Variables:")
+  output$p2 <- renderTable(input$mlr_preds, colnames=FALSE)
+  output$p3_title <- NULL
+  output$p3 <- NULL
+  output$p4_title <- NULL
+  output$p4 <- NULL
+  }
 
   
-  if(input$model_radio %in% c(2,3) & is.null(rf_train_results)==0){
-    output$p2_title <- renderText("Predicted Wine Quality per RF Model")
-    output$p2 <- renderPrint({rf_pred})
-    }    
+else if(input$model_radio==2 & is.null(rf_train_results)==0){
+  rf_pred <- predict(rf_train_results, newdata=to_be_pred,
+                     se.rf_train_results = TRUE, interval = "confidence")
+
+  output$p1_title <- renderText("Predicted Wine Quality per RF Model:")
+  output$p1 <- renderTable(rf_pred, colnames=FALSE)
+  output$p2_title <- renderText("RF Predictor Variables:")
+  output$p2 <- renderTable(input$rf_preds, colnames=FALSE)
+  output$p3_title <- NULL
+  output$p3 <- NULL
+  output$p4_title <- NULL
+  output$p4 <- NULL
+  }
+
   
+else if(input$model_radio==3 & is.null(mlr_train_results)==0 & is.null(rf_train_results)==0){
+  mlr_pred <- predict(mlr_train_results, newdata=to_be_pred,
+                     se.mlr_train_results = TRUE, interval = "confidence")
+  
+  rf_pred <- predict(rf_train_results, newdata=to_be_pred,
+                     se.rf_train_results = TRUE, interval = "confidence")
+
+  output$p1_title <- renderText("Predicted Wine Quality per MLR Model:")
+  output$p1 <- renderTable(mlr_pred, colnames=FALSE)
+  output$p2_title <- renderText("MLR Predictor Variables:")
+  output$p2 <- renderTable(input$mlr_preds, colnames=FALSE)
+  output$p3_title <- renderText("Predicted Wine Quality per RF Model")
+  output$p3 <- renderTable(rf_pred, colnames=FALSE)
+  output$p4_title <- renderText("RF Predictor Variables:")
+  output$p4 <- renderTable(input$rf_preds, colnames=FALSE)
+  }
+
 })
 
 })
+  
+  
 
+#off-chance that someone clicks "predict" prior to having fit any models  
+observeEvent(input$predict, {
+  
+#jump to top of output screen
+shinyjs::runjs("window.scrollTo(0, 0)")
+
+  output$p1_title <- renderText('Please fit a model using the "Model Fitting" tab before making predictions!')
+  output$p1 <- NULL
+  output$p2_title <- NULL
+  output$p2 <- NULL
+  output$p3_title <- NULL
+  output$p3 <- NULL
+  output$p4_title <- NULL
+  output$p4 <- NULL
+})
 
 
 
