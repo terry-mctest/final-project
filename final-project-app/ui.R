@@ -12,8 +12,11 @@ library(janitor)
     
 fluidPage(
   
-  theme = bslib::bs_theme(bootswatch = "slate"),
+  theme = bslib::bs_theme(bootswatch = "morph"),
   #https://bootswatch.com/
+  #solar
+  #slate
+  #morph
 
       
   tabsetPanel(
