@@ -12,7 +12,7 @@ library(janitor)
     
 fluidPage(
   
-  theme = bslib::bs_theme(bootswatch = "morph"),
+  theme = bslib::bs_theme(bootswatch = "slate"),
   #https://bootswatch.com/
 
       
