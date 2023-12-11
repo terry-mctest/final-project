@@ -1,12 +1,3 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(readr)
 library(ggplot2)
@@ -312,7 +303,7 @@ if(input$model_radio %in% c(2,3) & is.null(input$rf_preds)==0){
     mtry_value <- (round((ncol(rf_train_dat)/input$div),digits=0))}
 
     
-  withProgress(message = "Fitting model, thanks for your patience...",{  
+  withProgress(message = "Fitting model(s), thanks for your patience...",{  
     rf_train_results <- train(quality ~ ., data = rf_train_dat,
         method="rf", 
         preProcess=c("center","scale"),
