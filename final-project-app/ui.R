@@ -160,7 +160,7 @@ fluidPage(
           titlePanel(h2("MODELING INFO", align = "center")),
           'The current tab provides basic information about the two sub-tabs to follow: "Model Fitting" and "Predictions".  The ',
           br(), br(),
-          div(img(src='Minho_Vineyards_Moncao_credit_Alamy_r.jpg', 
+          div(img(src='Minho_Vineyards_Moncao_credit_Alamy_rr.jpg', 
               align = "center",
               height = "65%", width = "65%"), 
               style="text-align: center;"),
