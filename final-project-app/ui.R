@@ -28,26 +28,26 @@ fluidPage(
       titlePanel(h2("WELCOME TO THE WINE QUALITY DATA TOOL", align = "center")),
       br(),
       'The Wine Quality Data Tool is designed to facilitate use of the wine quality data made available by the UC-Irvine Machine Learning Repository at ',
-      tags$a(href = "https://archive.ics.uci.edu/dataset/186/wine+quality", "https://archive.ics.uci.edu/dataset/186/wine+quality"),'. The data in question are comprised of subjective quality ratings as well as various physicochemical measures associated with over 4,000 red and white variants of the Portuguese "Vinho Verde" wines. A particular focus of this tool is the use of these data to better understand the determinants of wine quality.',
+      tags$a(href = "https://archive.ics.uci.edu/dataset/186/wine+quality", "https://archive.ics.uci.edu/dataset/186/wine+quality"),'. Included in these data are (1) a subjective quality rating of each wine, (2) a categorical indicator of wine type (red vs. white), and (3) eleven continuous measures of various physicochemical properties associated with each wine.  The measures in question are available for approximately 6,500 red and white variants of the Portuguese "Vinho Verde" wines.',
       br(), br(),
       div(img(src='17250728595289e_1920_rr.jpg', align = "center",
               height = "75%", width = "75%"), 
               style="text-align: center;"),
       br(),
       h3("Features of This Tool"),
-      "This tool is comprised of three primary tabs, the second and third of which allow users to drill down to various sub-tabs; the tabs in question are as follows:",
+      "A particular focus of this tool is the use of these data to better understand the determinants of wine quality. Users can interact with the data via three primary tabs included within the tool, the second and third of which allow users to drill down to various sub-tabs.  The tabs in question are as follows:",
       tags$ul(
-        tags$li(strong(tags$i("About.")), "Basic information about the tool"), 
-        tags$li(strong(tags$i("Data Exploration,")),"which contains the following sub-tabs:"),
+        tags$li("The ",strong(tags$i("About")), "tab, which provides basic information about the tool"), 
+        tags$li("The ",strong(tags$i("Data Exploration")),"tab, which contains the following sub-tabs:"),
           tags$ul(
             tags$li(tags$i("Basic descriptives:")," This tab allows for generation of uni- and bi-variate visualizations and summary statistics"),
             tags$li(tags$i("Associations with wine quality:")," This tab allows for generation of multivariate visualizations and summary statistics regarding associations between wine type, physicochemical properties, and wine quality"),
           ),
-        tags$li(strong(tags$i("Modeling,")),"which contains the following sub-tabs:"),
+        tags$li("The ",strong(tags$i("Modeling")),"tab, which contains the following sub-tabs:"),
           tags$ul(
-            tags$li(tags$i("Modeling info:"),""),
-            tags$li(tags$i("Model fitting:"),""),
-            tags$li(tags$i("Prediction:"),"")
+            tags$li(tags$i("Modeling info:"),"This tab provides further detail about the modeling components of the Wine Quality Data Tool"),
+            tags$li(tags$i("Model fitting:"),"This tab allows the user to specify models and fit them to the data"),
+            tags$li(tags$i("Prediction:"),"This tab allows users to define features of a specific wine and predict the quality of said wine based on models they have fit")
           ),
       ),
     ),
@@ -108,7 +108,7 @@ fluidPage(
           strong("Use the inputs in the left-hand panel below to investigate the relationship between wine quality and other features of Vinho Verde wines."),
           sidebarLayout(
             sidebarPanel(
-              selectInput("q_dropdown", "First, select measure of interest:",
+              selectInput("q_dropdown", "First, select the measure to investigate relative to wine quality:",
                 choices = c("fixed_acidity",# = 1, 
                             "volatile_acidity",# = 2, 
                             "citric_acid",# = 3,
@@ -134,7 +134,7 @@ fluidPage(
             ),
             mainPanel(
               plotOutput("q_plot"),
-              strong("NOTE: Wine quality was rated on a scale of 0 to 10, where 0 indicates the lowest quality, and 10 indicates the highest quality."),
+              strong("NOTE: Wine quality was rated on a scale of 0 to 10, where 0 indicates the lowest quality, and 10 indicates the highest quality.  See listing to follow for specific correlation coefficients associated with the plot above:"),
               br(),
               br(),
               h5("Correlation Coefficient(s):"),
@@ -158,7 +158,14 @@ fluidPage(
         
         tabPanel("Modeling Info", 
           titlePanel(h2("MODELING INFO", align = "center")),
-          br()
+          'The current tab provides basic information about the two sub-tabs to follow: "Model Fitting" and "Predictions".  The ',
+          br(), br(),
+          div(img(src='Minho_Vineyards_Moncao_credit_Alamy_r.jpg', 
+              align = "center",
+              height = "65%", width = "65%"), 
+              style="text-align: center;"),
+          br(),
+          "a;lfkjas;dlkfjsadfoiuaofdadsf"
         ),
 
                         
@@ -168,7 +175,7 @@ fluidPage(
         
         tabPanel("Model Fitting",
           titlePanel(h2("MODELING WINE QUALITY", align="center")),
-          strong('Use the inputs in the left-hand panel below to specify your model(s) of interest, then click the click the "Fit model(s)" button to fit your models and generate results.  The dependent variable in these models is wine quality, which was rated on a scale of 0 to 10, where 0 indicates the lowest quality and 10 indicates the highest quality.'),
+          strong('Use the inputs in the left-hand panel below to specify your model(s) of interest, then click the "Fit model(s)" button to fit your models and generate results.  The dependent variable in these models is wine quality, which was rated on a scale of 0 to 10, where 0 indicates the lowest quality and 10 indicates the highest quality.'),
           sidebarLayout(
             sidebarPanel(
               useShinyjs(), #allow for jumping to the top of mainpanel output
@@ -243,7 +250,7 @@ fluidPage(
         
         tabPanel("Prediction",
           titlePanel(h2("PREDICTING WINE QUALITY", align="center")),
-          strong('If you have already fit a model on the "Model Fitting" tab, you can then predict wine quality for a specific wine by selecting the feature values of said wine using the inputs in the left-hand panel to follow (each feature below is initialized to its mean value in the wine quality data); after selecting feature values, click on "Predict Wine Quality" to obtain wine quality rating(s) as predicted by your model(s). Predictions will be made per the most recent MLR model and/or the most recent RF model which you fit on the "Model Fitting" tab.'),
+          strong('If you have already fit a model on the "Model Fitting" tab, you can then predict wine quality for a specific wine by selecting the feature values of said wine using the inputs in the left-hand panel below (each feature below is initialized to its mean value in the wine quality data); after selecting feature values, click on "Predict Wine Quality" to obtain wine quality rating(s) as predicted by your model(s). Predictions will be made per the most recent MLR model and/or the most recent RF model which you fit on the "Model Fitting" tab.'),
           sidebarLayout(
             sidebarPanel(
               useShinyjs(), #allow for jumping to the top of mainpanel output
