@@ -158,14 +158,27 @@ fluidPage(
         
         tabPanel("Modeling Info", 
           titlePanel(h2("MODELING INFO", align = "center")),
-          'The current tab provides basic information about the two sub-tabs to follow: "Model Fitting" and "Predictions".  The ',
+          'The current tab provides basic modeling information, specifically as it relates to the "Model Fitting" and "Predictions" sub-tabs to follow.  The former of these two sub-tabs allows users to specify models and fit them to the wine quality data, and the latter of these two tabs allows users to make predictions about a specific wine using a model they have fit.',
           br(), br(),
           div(img(src='Minho_Vineyards_Moncao_credit_Alamy_rr.jpg', 
               align = "center",
               height = "65%", width = "65%"), 
               style="text-align: center;"),
           br(),
-          "a;lfkjas;dlkfjsadfoiuaofdadsf"
+          'The "Model Fitting" sub-tab allows users to fit either a Multiple Linear Regression (MLR) model, and/or a Random Forest (RF) model; before proceeding, users of the Wine Quality Data Tool may benefit from noting the relative strengths and weaknesses of each of these types of models:',
+          br(), br(),
+          h4("Multiple Linear Regression"),
+          "In a simple linear regression (SLR) model, a given response/dependent variable is defined as a linear function of a single explanatory variable; similarly, in a multiple linear regression (MLR) model, a given response/dependent variable is defined as a linear function of multiple explanatory variables. The basic form of an MLR model is:",
+          withMathJax(),
+          "$$Y_i = \\beta_0 + \\beta_1 x_{1i} + \\beta_2 x_{2i} + \\dots + E_i$$",
+          "where",tags$i("B0"),"is the intercept,",tags$i("B1"),"is the slope associated with the first explanatory variable,",tags$i("x1i"),"is the value of the first explanatory variable for the ith observation,",tags$i("Yi"),"is the value of the response variable for the ith observation, and",tags$i("Ei"),"is the error term associated with the ith observation. The linear function of an MLR model is one which minimizes the sum of squared residuals; that is, the linear function minimizes the sum of squared differences between actual and predicted response values, as represented by the following formula:",
+          div("$$\\sum_{i=1}^n(Y_i - \\widehat Y_i)^2$$"),
+          'Strengths of MLR models include their relative ease of interpretation (e.g. a given change in a given explanatory variable results in a given change in the response variable), and their ability to quantify the influence of a given explanatory variable relative to that of other explanatory variables.  MLR models are less-than well-equipped, however, to handle situations where there is non-linear relationship between predictors and response (this is at least true of first-order MLR models), and/or when predictor variables are highly correlated.',
+          br(), br(),
+          h4("Random Forest"),
+          "alkjdf;lakjdfsadsf",
+          br(), br(),
+          h4("Other Considerations")
         ),
 
                         
@@ -176,6 +189,7 @@ fluidPage(
         tabPanel("Model Fitting",
           titlePanel(h2("MODELING WINE QUALITY", align="center")),
           strong('Use the inputs in the left-hand panel below to specify your model(s) of interest, then click the "Fit model(s)" button to fit your models and generate results.  The dependent variable in these models is wine quality, which was rated on a scale of 0 to 10, where 0 indicates the lowest quality and 10 indicates the highest quality.'),
+          br(), br(),
           sidebarLayout(
             sidebarPanel(
               useShinyjs(), #allow for jumping to the top of mainpanel output
@@ -251,6 +265,7 @@ fluidPage(
         tabPanel("Prediction",
           titlePanel(h2("PREDICTING WINE QUALITY", align="center")),
           strong('If you have already fit a model on the "Model Fitting" tab, you can then predict wine quality for a specific wine by selecting the feature values of said wine using the inputs in the left-hand panel below (each feature below is initialized to its mean value in the wine quality data); after selecting feature values, click on "Predict Wine Quality" to obtain wine quality rating(s) as predicted by your model(s). Predictions will be made per the most recent MLR model and/or the most recent RF model which you fit on the "Model Fitting" tab.'),
+          br(), br(),
           sidebarLayout(
             sidebarPanel(
               useShinyjs(), #allow for jumping to the top of mainpanel output
