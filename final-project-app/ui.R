@@ -158,7 +158,7 @@ fluidPage(
         
         tabPanel("Modeling Info", 
           titlePanel(h2("MODELING INFO", align = "center")),
-          'The current tab provides basic modeling information, specifically as it relates to the "Model Fitting" and "Predictions" sub-tabs to follow.  The former of these two sub-tabs allows users to specify models and fit them to the wine quality data, and the latter of these two tabs allows users to make predictions about a specific wine using a model they have fit.',
+          'The current tab provides basic modeling information, especially as it relates to the "Model Fitting" and "Predictions" sub-tabs to follow.  The former of these two sub-tabs allows users to specify models and fit them to the wine quality data, and the latter of these two tabs allows users to make predictions about a specific wine using a model they have fit.',
           br(), br(),
           div(img(src='Minho_Vineyards_Moncao_credit_Alamy_rr.jpg', 
               align = "center",
@@ -206,7 +206,7 @@ fluidPage(
               numericInput("cv", "Then select the desired number of cross-validation folds (between 3 and 6):", 3, min = 3, max = 6),
               br(),
               conditionalPanel(condition = "input.model_radio != 1",
-                  numericInput("div", "RF tuning parameter divisor:", 2, 
+                  numericInput("div", "RF tuning parameter divisor (i.e. tuning parameter is # of predictors divided by the value selected here):", 2, 
                                min = 1, max = 5, step = 0.25)),
               br(),
               conditionalPanel(condition = "input.model_radio != 2",

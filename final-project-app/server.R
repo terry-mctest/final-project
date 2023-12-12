@@ -300,7 +300,7 @@ if(input$model_radio %in% c(2,3) & is.null(input$rf_preds)==0){
   #variables selected
   if(ncol(rf_train_dat)==2){mtry_value <- 1}
   else if(ncol(rf_train_dat) > 2){
-    mtry_value <- (round((ncol(rf_train_dat)/input$div),digits=0))}
+    mtry_value <- (round(((ncol(rf_train_dat) - 1)/input$div),digits=0))}
 
     
   withProgress(message = "Fitting model(s), thanks for your patience...",{  
