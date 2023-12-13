@@ -472,9 +472,9 @@ if(input$model_radio==1 & is.null(mlr_train_results)==0){
   mlr_pred <- predict(mlr_train_results, newdata=to_be_pred,
                      se.mlr_train_results = TRUE, interval = "confidence")
   
-  output$p1_title <- renderText("Predicted Wine Quality per MLR Model:")
+  output$p1_title <- renderText("Predicted Wine Quality Rating per MLR Model:")
   output$p1 <- renderTable(mlr_pred, colnames=FALSE)
-  output$p2_title <- renderText("MLR Predictor Variables:")
+  output$p2_title <- renderText("MLR Predictor Variables (if adjusted in the left-hand panel, values for these features may change the prediction above):")
   output$p2 <- renderTable(input$mlr_preds, colnames=FALSE)
   output$p3_title <- NULL
   output$p3 <- NULL
@@ -487,9 +487,9 @@ else if(input$model_radio==2 & is.null(rf_train_results)==0){
   rf_pred <- predict(rf_train_results, newdata=to_be_pred,
                      se.rf_train_results = TRUE, interval = "confidence")
 
-  output$p1_title <- renderText("Predicted Wine Quality per RF Model:")
+  output$p1_title <- renderText("Predicted Wine Quality Rating per RF Model:")
   output$p1 <- renderTable(rf_pred, colnames=FALSE)
-  output$p2_title <- renderText("RF Predictor Variables:")
+  output$p2_title <- renderText("RF Predictor Variables (if adjusted in the left-hand panel, values for these features may change the prediction above):")
   output$p2 <- renderTable(input$rf_preds, colnames=FALSE)
   output$p3_title <- NULL
   output$p3 <- NULL
@@ -505,13 +505,13 @@ else if(input$model_radio==3 & is.null(mlr_train_results)==0 & is.null(rf_train_
   rf_pred <- predict(rf_train_results, newdata=to_be_pred,
                      se.rf_train_results = TRUE, interval = "confidence")
 
-  output$p1_title <- renderText("Predicted Wine Quality per MLR Model:")
+  output$p1_title <- renderText("Predicted Wine Quality Rating per MLR Model:")
   output$p1 <- renderTable(mlr_pred, colnames=FALSE)
-  output$p2_title <- renderText("MLR Predictor Variables:")
+  output$p2_title <- renderText("MLR Predictor Variables (if adjusted in the left-hand panel, values for these features may change the MLR prediction above):")
   output$p2 <- renderTable(input$mlr_preds, colnames=FALSE)
-  output$p3_title <- renderText("Predicted Wine Quality per RF Model")
+  output$p3_title <- renderText("Predicted Wine Quality Rating per RF Model")
   output$p3 <- renderTable(rf_pred, colnames=FALSE)
-  output$p4_title <- renderText("RF Predictor Variables:")
+  output$p4_title <- renderText("RF Predictor Variables (if adjusted in the left-hand panel, values for these features may change the RF prediction above):")
   output$p4 <- renderTable(input$rf_preds, colnames=FALSE)
   }
 
