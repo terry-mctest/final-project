@@ -158,7 +158,7 @@ fluidPage(
         
         tabPanel("Modeling Info", 
           titlePanel(h2("MODELING INFO", align = "center")),
-          'The current tab provides basic modeling information, especially as it relates to the "Model Fitting" and "Predictions" sub-tabs to follow.  The former of these two sub-tabs allows users to specify models and fit them to the wine quality data, and the latter of these two tabs allows users to make predictions about a specific wine using a model they have fit.',
+          'The current tab provides some basic modeling information, especially as it relates to the "Model Fitting" and "Predictions" sub-tabs to follow.  The former of these two sub-tabs allows users to specify models and fit them to the wine quality data, and the latter of these two tabs allows users to make predictions about a specific wine using a model they have fit.',
           br(),
           div(img(src='Minho_Vineyards_Moncao_credit_Alamy_rr.jpg', 
               align = "center",
@@ -176,13 +176,18 @@ fluidPage(
           'Strengths of MLR models include their relative ease of interpretation (e.g. a given change in a given explanatory variable results in a given change in the response variable), and their ability to quantify the influence of a given explanatory variable relative to that of other explanatory variables.  MLR models are less-than well-equipped, however, to handle situations where there is non-linear relationship between predictors and response (this is at least true of first-order MLR models), and/or when predictor variables are highly correlated.',
           br(), br(),
           h4("Random Forest"),
-          'A Random Forest (RF) model is a particular type of tree-based ensemble model.  Tree-based models are ones in which the predictor space is strategically divided into different regions, and the predicted value for any given observation is the most common response value among all other observations in that region; ensemble modeling methods are ones which average predicted outcome values across multiple models in hopes of decreasing the variance of the model.',
+          'A Random Forest (RF) model is a particular type of tree-based ensemble model.  Tree-based models are ones in which the predictor space is strategically divided into different regions, and a predicted value is assigned as the average response value among all other observations in that region (or, the most common classification among all other observations in that region); ensemble modeling methods are ones which average predicted outcome values across multiple models in hopes of decreasing the variance of the model.',
           br(), br(),
           'More specifically, a Random Forest model uses bootstrap sampling to create multiple samples, and then fits a different model -- each model using a random subset of predictors (i.e. each model having different numbers and combinations of predictors) -- to each of those bootstrap samples.  After doing so, predicted values are averaged across the multiple models.',
            br(), br(),
-          'More blah blah blah',
+          'A relative strength of this modeling approach is that, since multiple random subsets of predictors are employed, there is a lower correlation between the resulting predicted values which are then averaged, meaning that RF models are less prone to over-fitting; RF models also automatically account for interaction effects, whereas interaction effects need explicit specification in MLR models.  Relative weaknesses of RF models are the interpretability of their results, and the computational time/power required to run such models (on the "Model Fitting" tab to follow, users may notice that MLR models run almost instantaneously, while RF models take longer to generate results).',
           br(), br(),
-          h4("Other Considerations")
+          h4("Other Considerations"),
+          tags$ul(
+            tags$li(strong(tags$i('Tuning parameter (required for RF models, but not for MLR models).')),'Generally speaking, the RF tuning parameter is the number of variables included in the random subset of predictors used in the RF model.  On the "Model Fitting" tab to follow, users may notice that a tuning parameter',tags$i("divisor"),'is requested if/when fitting an RF model; more specifically, the tuning parameter employed when fitting an RF model will be the total number of predictors divided by the user-provided divisor.'),
+            tags$li(strong(tags$i('Training data vs. test data.')),'The "Model Fitting" tab to follow allows users to define the proportion of records to be randomly selected for use in model training; after training, the resulting model will then be tested on the remaining observations, with fit statistics being provided for both the training data and the test data.'),
+            tags$li(strong(tags$i('Cross-validation folds.')),'Relatedly, the "Model Fitting" tab',"also allows users to define the number of cross-validation folds to be used during model training. That is, per the user's specification, the training data is split into X number of folds, the model is trained on X-1 folds, and is then tested on the remaining fold; this process is repeated until each fold is ultimately used for both training and testing,",'and a "best" model is selected.')
+          )
         ),
 
                         
@@ -210,9 +215,8 @@ fluidPage(
               numericInput("cv", "Then select the desired number of cross-validation folds (between 3 and 6):", 3, min = 3, max = 6),
               br(),
               conditionalPanel(condition = "input.model_radio != 1",
-                  numericInput("div", "RF tuning parameter divisor (i.e. tuning parameter is # of predictors divided by the value selected here):", 2, 
+                  numericInput("div", "RF tuning parameter divisor (i.e. the RF tuning parameter will be the # of predictors divided by the value selected here):", 2, 
                                min = 1, max = 5, step = 0.25)),
-              br(),
               conditionalPanel(condition = "input.model_radio != 2",
                 checkboxGroupInput("mlr_preds", 
                       "Don't forget to select right-side variables for your MLR model!",
