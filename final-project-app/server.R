@@ -229,8 +229,29 @@ else if(input$wine_type_radio != 1){
   
 ############################
 # *MODEL FITTING* (sub)TAB #
-############################  
+############################
+
+#account for off-chance someone tries to make predictions prior to fitting a model
+observeEvent(input$predict, {
+
+  if(input$run_model != 1){  
+    #jump to top of output screen
+    shinyjs::runjs("window.scrollTo(0, 0)")
+  
+    output$p1_title <- renderText("Don't forget to fit a model before making predictions!")
+    output$p1 <- NULL
+    output$p2_title <- NULL
+    output$p2 <- NULL
+    output$p3_title <- NULL
+    output$p3 <- NULL
+    output$p4_title <- NULL
+    output$p4 <- NULL
+  }
+  
+})
+  
  
+  
 observeEvent(input$run_model, {
 
   
@@ -298,9 +319,8 @@ if(input$model_radio %in% c(2,3) & is.null(input$rf_preds)==0){
   #setting up tuning parameter in this way so as to avoid complications 
   #re: tuning parameter that is greater than the number of predictor
   #variables selected
-  if(ncol(rf_train_dat)==2){mtry_value <- 1}
-  else if(ncol(rf_train_dat) > 2){
-    mtry_value <- (round(((ncol(rf_train_dat) - 1)/input$div),digits=0))}
+  mtry_value <- (round(((ncol(rf_train_dat) - 1)/input$div),digits=0))
+  if((ncol(rf_train_dat) - 1)/input$div < 1){mtry_value <- 1}
 
     
   withProgress(message = "Fitting model(s), thanks for your patience...",{  
@@ -499,24 +519,5 @@ else if(input$model_radio==3 & is.null(mlr_train_results)==0 & is.null(rf_train_
 
 })
   
-  
-
-#off-chance that someone clicks "predict" prior to having fit any models  
-observeEvent(input$predict, {
-  
-#jump to top of output screen
-shinyjs::runjs("window.scrollTo(0, 0)")
-
-  output$p1_title <- renderText('Please fit a model using the "Model Fitting" tab before making predictions!')
-  output$p1 <- NULL
-  output$p2_title <- NULL
-  output$p2 <- NULL
-  output$p3_title <- NULL
-  output$p3 <- NULL
-  output$p4_title <- NULL
-  output$p4 <- NULL
 })
-
-
-
-})
+  
